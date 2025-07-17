@@ -22,3 +22,4 @@ yarn-error.log*
 
 # Ignore backend environment variables
 backend/.env
+backend/.env
