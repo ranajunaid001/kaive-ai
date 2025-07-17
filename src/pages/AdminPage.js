@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function AdminPage({ onNavigate }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [stats, setStats] = useState({
+    total_posts: 0,
+    unique_authors: 0,
+    files_processed: 0
+  });
+  const [isUploading, setIsUploading] = useState(false);
 
   const creators = [
     { id: 1, name: 'Sarah Chen', title: 'Product Designer at Meta', posts: '1.2K', match: '89%', rating: '4.8', emoji: '👩‍💻' },
@@ -11,19 +17,73 @@ function AdminPage({ onNavigate }) {
     { id: 3, name: 'Maria Rodriguez', title: 'Marketing Director', posts: '456', match: '87%', rating: '4.7', emoji: '👩‍🏫' },
   ];
 
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setUploadedFiles([...uploadedFiles, ...files]);
+  // Fetch stats when component mounts
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('https://kaive-ai-production-7be5.up.railway.app/stats');
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
   };
 
-  const handleDrop = (e) => {
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      setIsUploading(true);
+      const response = await fetch('https://kaive-ai-production-7be5.up.railway.app/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      console.log('Upload result:', result);
+      
+      if (result.status === 'success') {
+        alert(`Successfully processed ${result.processed_posts} posts from ${file.name}`);
+        fetchStats(); // Refresh stats after upload
+      } else {
+        alert(`Error: ${result.detail || 'Upload failed'}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Error uploading file: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    setUploadedFiles([...uploadedFiles, ...files]);
+    
+    // Upload each file
+    for (const file of files) {
+      await uploadFile(file);
+    }
+  };
+
+  const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragging(false);
     const files = Array.from(e.dataTransfer.files).filter(file => 
       file.name.endsWith('.xlsx') || file.name.endsWith('.xls')
     );
+    
     if (files.length > 0) {
       setUploadedFiles([...uploadedFiles, ...files]);
+      
+      // Upload each file
+      for (const file of files) {
+        await uploadFile(file);
+      }
     }
   };
 
@@ -53,23 +113,23 @@ function AdminPage({ onNavigate }) {
           <p>Elegantly manage your AI-powered creator voices</p>
         </div>
 
-        {/* Stats */}
+        {/* Stats - Now showing real data */}
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-number">127</div>
+            <div className="stat-number">{stats.unique_authors}</div>
             <div className="stat-label">Creators</div>
           </div>
           <div className="stat-card">
-            <div className="stat-number">3.4K</div>
-            <div className="stat-label">Generated</div>
+            <div className="stat-number">{stats.total_posts}</div>
+            <div className="stat-label">Posts</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{stats.files_processed}</div>
+            <div className="stat-label">Files</div>
           </div>
           <div className="stat-card">
             <div className="stat-number">98%</div>
             <div className="stat-label">Accuracy</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">1.2M</div>
-            <div className="stat-label">Data Points</div>
           </div>
         </div>
 
@@ -77,21 +137,22 @@ function AdminPage({ onNavigate }) {
         <div className="upload-section">
           <h2 className="section-title">Import Creator Data</h2>
           <div 
-            className={`upload-zone ${isDragging ? 'dragging' : ''}`}
+            className={`upload-zone ${isDragging ? 'dragging' : ''} ${isUploading ? 'uploading' : ''}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
           >
             <div className="upload-icon">📊</div>
-            <h3>Drop Excel files here</h3>
-            <p>Import LinkedIn creator profiles with a simple drag</p>
-            <label className="upload-btn">
-              Select Files
+            <h3>{isUploading ? 'Processing...' : 'Drop Excel files here'}</h3>
+            <p>{isUploading ? 'Please wait while we process your file' : 'Import LinkedIn creator profiles with a simple drag'}</p>
+            <label className="upload-btn" style={{ opacity: isUploading ? 0.5 : 1, pointerEvents: isUploading ? 'none' : 'auto' }}>
+              {isUploading ? 'Processing...' : 'Select Files'}
               <input
                 type="file"
                 multiple
                 accept=".xlsx,.xls"
                 onChange={handleFileUpload}
+                disabled={isUploading}
                 style={{ display: 'none' }}
               />
             </label>
