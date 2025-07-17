@@ -101,7 +101,7 @@ async def upload_excel(file: UploadFile):
         
         # Read file based on extension
         if file.filename.endswith('.csv'):
-            df = pd.read_csv(io.BytesIO(contents), encoding='utf-8', errors='ignore')
+            df = pd.read_csv(io.BytesIO(contents), encoding='utf-8')
         else:
             df = pd.read_excel(io.BytesIO(contents))
         
