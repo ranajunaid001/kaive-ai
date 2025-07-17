@@ -37,7 +37,7 @@ async def root():
 async def upload_excel(file: UploadFile):
     try:
         # Check file type
-        if not file.filename.endswith(('.xlsx', '.xls')):
+        if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
             raise HTTPException(400, "Please upload an Excel file")
         
         # Read file content
