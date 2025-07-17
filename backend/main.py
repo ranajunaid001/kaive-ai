@@ -29,6 +29,49 @@ supabase: Client = create_client(
 )
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def clean_text(text):
+    """Clean special characters and fix encoding issues"""
+    if pd.isna(text):
+        return ""
+    
+    text = str(text)
+    
+    # Fix common encoding issues
+    replacements = {
+        'â€™': "'",
+        'â€"': "–",
+        'â€"': "—",
+        'â€œ': '"',
+        'â€': '"',
+        'â€¦': '...',
+        'Â': ' ',
+        'â': "'",
+        'ðŸ': '',  # Remove corrupted emojis
+        'Ã©': 'é',
+        'Ã¨': 'è',
+        'Ã ': 'à',
+        'Ã¢': 'â',
+        'Ã´': 'ô',
+        'Ã®': 'î',
+        'Ã§': 'ç',
+        'Ãª': 'ê',
+        'Ã¹': 'ù',
+        'Ã€': 'À',
+        '\xa0': ' ',  # Non-breaking space
+        '\u200b': '',  # Zero-width space
+    }
+    
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    
+    # Remove any remaining non-printable characters
+    text = ''.join(char for char in text if char.isprintable() or char.isspace())
+    
+    # Clean up multiple spaces
+    text = ' '.join(text.split())
+    
+    return text.strip()
+
 @app.get("/")
 async def root():
     return {"message": "Kaive AI Backend Running"}
@@ -38,7 +81,7 @@ async def upload_excel(file: UploadFile):
     try:
         # Check file type
         if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
-            raise HTTPException(400, "Please upload an Excel file")
+            raise HTTPException(400, "Please upload an Excel or CSV file")
         
         # Read file content
         contents = await file.read()
@@ -56,10 +99,9 @@ async def upload_excel(file: UploadFile):
             'status': 'processing'
         }).execute()
         
-        # Read Excel file
         # Read file based on extension
         if file.filename.endswith('.csv'):
-            df = pd.read_csv(io.BytesIO(contents))
+            df = pd.read_csv(io.BytesIO(contents), encoding='utf-8', errors='ignore')
         else:
             df = pd.read_excel(io.BytesIO(contents))
         
@@ -76,32 +118,56 @@ async def upload_excel(file: UploadFile):
                 if pd.isna(row['postContent']) or not str(row['postContent']).strip():
                     continue
                 
-                # Clean the content
-                content = str(row['postContent']).strip()
+                # Clean the content and author
+                content = clean_text(row['postContent'])
+                author = clean_text(row['author'])
+                
+                # Skip if content is empty after cleaning
+                if not content:
+                    continue
                 
                 # Generate embedding
-                response = openai.embeddings.create(
-                    input=content,
-                    model="text-embedding-3-small"
-                )
-                embedding = response.data[0].embedding
+                try:
+                    response = openai.embeddings.create(
+                        input=content,
+                        model="text-embedding-3-small"
+                    )
+                    embedding = response.data[0].embedding
+                except Exception as e:
+                    print(f"Error generating embedding for row {index}: {str(e)}")
+                    embedding = None
                 
                 # Prepare data for insertion
                 post_data = {
-                    'author': str(row['author']),
+                    'author': author,
                     'post_content': content,
-                    'embedding': embedding
                 }
+                
+                # Only add embedding if it was generated successfully
+                if embedding:
+                    post_data['embedding'] = embedding
                 
                 # Add optional fields if they exist
                 if 'postDate' in row and pd.notna(row['postDate']):
-                    post_data['post_date'] = pd.to_datetime(row['postDate']).strftime('%Y-%m-%d')
+                    try:
+                        post_data['post_date'] = pd.to_datetime(row['postDate']).strftime('%Y-%m-%d')
+                    except:
+                        pass
+                
                 if 'likeCount' in row and pd.notna(row['likeCount']):
-                    post_data['like_count'] = int(row['likeCount'])
+                    try:
+                        post_data['like_count'] = int(float(str(row['likeCount']).replace(',', '')))
+                    except:
+                        post_data['like_count'] = 0
+                
                 if 'commentCount' in row and pd.notna(row['commentCount']):
-                    post_data['comment_count'] = int(row['commentCount'])
+                    try:
+                        post_data['comment_count'] = int(float(str(row['commentCount']).replace(',', '')))
+                    except:
+                        post_data['comment_count'] = 0
+                
                 if 'postUrl' in row and pd.notna(row['postUrl']):
-                    post_data['post_url'] = str(row['postUrl'])
+                    post_data['post_url'] = clean_text(row['postUrl'])
                 
                 # Insert into database
                 supabase.table('creator_posts').insert(post_data).execute()
