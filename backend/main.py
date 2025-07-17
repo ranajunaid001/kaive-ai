@@ -59,9 +59,9 @@ async def upload_excel(file: UploadFile):
         # Read Excel file
         # Read file based on extension
         if file.filename.endswith('.csv'):
-        df = pd.read_csv(io.BytesIO(contents))
+            df = pd.read_csv(io.BytesIO(contents))
         else:
-        df = pd.read_excel(io.BytesIO(contents))
+            df = pd.read_excel(io.BytesIO(contents))
         
         # Validate required columns
         required_columns = ['postContent', 'author']
