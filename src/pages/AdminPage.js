@@ -150,7 +150,7 @@ function AdminPage({ onNavigate }) {
               <input
                 type="file"
                 multiple
-                accept=".xlsx,.xls"
+                accept=".xlsx,.xls,.csv"
                 onChange={handleFileUpload}
                 disabled={isUploading}
                 style={{ display: 'none' }}
