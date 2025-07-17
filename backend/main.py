@@ -106,7 +106,7 @@ async def upload_excel(file: UploadFile):
             df = pd.read_excel(io.BytesIO(contents))
         
         # Validate required columns
-        required_columns = ['postContent', 'author']
+        required_columns = ['postContent', 'author', 'likeCount', 'commentCount', 'repostCount', 'postDate', 'postTimestamp']
         if not all(col in df.columns for col in required_columns):
             raise HTTPException(400, f"Excel must contain columns: {required_columns}")
         
@@ -147,25 +147,50 @@ async def upload_excel(file: UploadFile):
                 if embedding:
                     post_data['embedding'] = embedding
                 
-                # Add optional fields if they exist
+                # Add required fields
                 if 'postDate' in row and pd.notna(row['postDate']):
                     try:
                         post_data['post_date'] = pd.to_datetime(row['postDate']).strftime('%Y-%m-%d')
                     except:
-                        pass
+                        post_data['post_date'] = datetime.now().strftime('%Y-%m-%d')
+                else:
+                    post_data['post_date'] = datetime.now().strftime('%Y-%m-%d')
                 
                 if 'likeCount' in row and pd.notna(row['likeCount']):
                     try:
                         post_data['like_count'] = int(float(str(row['likeCount']).replace(',', '')))
                     except:
                         post_data['like_count'] = 0
+                else:
+                    post_data['like_count'] = 0
                 
                 if 'commentCount' in row and pd.notna(row['commentCount']):
                     try:
                         post_data['comment_count'] = int(float(str(row['commentCount']).replace(',', '')))
                     except:
                         post_data['comment_count'] = 0
+                else:
+                    post_data['comment_count'] = 0
                 
+                # Add repostCount handling
+                if 'repostCount' in row and pd.notna(row['repostCount']):
+                    try:
+                        post_data['repost_count'] = int(float(str(row['repostCount']).replace(',', '')))
+                    except:
+                        post_data['repost_count'] = 0
+                else:
+                    post_data['repost_count'] = 0
+                
+                # Add postTimestamp handling
+                if 'postTimestamp' in row and pd.notna(row['postTimestamp']):
+                    try:
+                        post_data['post_timestamp'] = pd.to_datetime(row['postTimestamp']).isoformat()
+                    except:
+                        post_data['post_timestamp'] = datetime.now().isoformat()
+                else:
+                    post_data['post_timestamp'] = datetime.now().isoformat()
+                
+                # Add optional postUrl if it exists
                 if 'postUrl' in row and pd.notna(row['postUrl']):
                     post_data['post_url'] = clean_text(row['postUrl'])
                 
