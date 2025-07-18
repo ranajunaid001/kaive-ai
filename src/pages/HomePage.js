@@ -1,34 +1,96 @@
 import React, { useState } from 'react';
 
 function HomePage({ onNavigate }) {
-  const [showCreatorList, setShowCreatorList] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [writingText, setWritingText] = useState('');
-  const [showWritingFirst, setShowWritingFirst] = useState(false);
-  const [carouselIndex, setCarouselIndex] = useState(2);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showBubbles, setShowBubbles] = useState(true);
 
   const creators = [
-    { id: 1, name: 'Sarah Chen', title: 'Product Designer', tone: 'Minimalist, User-focused, Technical', emoji: '👩‍💻' },
-    { id: 2, name: 'Alex Kumar', title: 'Tech Founder', tone: 'Visionary, Bold, Inspirational', emoji: '👨‍💼' },
-    { id: 3, name: 'Maria Rodriguez', title: 'Marketing Expert', tone: 'Professional, Engaging, Data-driven', emoji: '👩‍🏫' },
-    { id: 4, name: 'James Park', title: 'AI Researcher', tone: 'Academic, Precise, Forward-thinking', emoji: '👨‍🔬' },
-    { id: 5, name: 'Emma Wilson', title: 'Startup Advisor', tone: 'Strategic, Practical, Growth-oriented', emoji: '👩‍💼' },
+    { 
+      id: 1, 
+      name: 'Sarah Chen', 
+      title: 'Product Designer', 
+      tone: 'Minimalist, User-focused', 
+      emoji: '👩‍💻',
+      match: 94,
+      avatar: 'https://res.cloudinary.com/dozrtbvmz/image/upload/v1752800602/Niharikka_y1octi.jpg',
+      color: '#FF6B6B',
+      size: 'large',
+      position: { left: '15%', top: '20%' },
+      metrics: { pulse: 92, aura: 95, auth: 96 }
+    },
+    { 
+      id: 2, 
+      name: 'Alex Kumar', 
+      title: 'Tech Founder', 
+      tone: 'Visionary, Bold', 
+      emoji: '👨‍💼',
+      match: 91,
+      avatar: '',
+      color: '#4ECDC4',
+      size: 'medium',
+      position: { left: '70%', top: '15%' },
+      metrics: { pulse: 90, aura: 92, auth: 91 }
+    },
+    { 
+      id: 3, 
+      name: 'Maria Rodriguez', 
+      title: 'Marketing Expert', 
+      tone: 'Professional, Data-driven', 
+      emoji: '👩‍🏫',
+      match: 89,
+      avatar: '',
+      color: '#45B7D1',
+      size: 'large',
+      position: { left: '50%', top: '40%' },
+      metrics: { pulse: 88, aura: 90, auth: 89 }
+    },
+    { 
+      id: 4, 
+      name: 'James Park', 
+      title: 'AI Researcher', 
+      tone: 'Academic, Precise', 
+      emoji: '👨‍🔬',
+      match: 87,
+      avatar: '',
+      color: '#96CEB4',
+      size: 'small',
+      position: { left: '25%', top: '60%' },
+      metrics: { pulse: 86, aura: 88, auth: 87 }
+    },
+    { 
+      id: 5, 
+      name: 'Emma Wilson', 
+      title: 'Startup Advisor', 
+      tone: 'Strategic, Practical', 
+      emoji: '👩‍💼',
+      match: 85,
+      avatar: '',
+      color: '#6C5CE7',
+      size: 'medium',
+      position: { left: '75%', top: '55%' },
+      metrics: { pulse: 84, aura: 87, auth: 83 }
+    }
   ];
 
-  const handleCreatorClick = (index) => {
-    setCarouselIndex(index);
-    setSelectedCreator(creators[index]);
+  const handleBubbleClick = (creator) => {
+    setSelectedCreator(creator);
   };
 
   const handleGenerate = () => {
+    if (!writingText.trim() || !selectedCreator) return;
+    
     setIsGenerating(true);
-    // Simulate API call
     setTimeout(() => {
       setIsGenerating(false);
-      alert(`Generated content in ${selectedCreator.name}'s voice!`);
-      // In production, this would call your ChatGPT API
+      alert(`✨ Generated content in ${selectedCreator.name}'s voice!`);
     }, 2000);
+  };
+
+  const handleCloseWriting = () => {
+    setSelectedCreator(null);
+    setWritingText('');
   };
 
   return (
@@ -48,131 +110,83 @@ function HomePage({ onNavigate }) {
         <h2>Write in any creator's voice</h2>
         <p>Powered by AI</p>
       </header>
-      
-      {/* Find Creators Button */}
-      <div className="find-creators-container">
-        <button className="find-creators-btn" onClick={() => setShowCreatorList(true)}>
-          🔍 Find Creators
-        </button>
-        
-        {/* Creator Pills */}
-        <div className="creator-pills">
-          <div className="avatar-group">
-            <span className="avatar">👤</span>
-            <span className="avatar">👤</span>
-            <span className="avatar">👤</span>
-          </div>
-          <span className="creator-count">Join 350+ creators</span>
-        </div>
-      </div>
 
-      {/* Carousel */}
-      <div className="carousel-section">
-        <div className="carousel-track">
-          {creators.map((creator, index) => (
+      {/* Floating Bubbles */}
+      {showBubbles && (
+        <div className="bubbles-container">
+          {creators.map((creator) => (
             <div
               key={creator.id}
-              className={`creator-card ${index === carouselIndex ? 'active' : ''}`}
-              onClick={() => handleCreatorClick(index)}
+              className={`bubble bubble-${creator.size} ${selectedCreator?.id === creator.id ? 'selected' : ''}`}
+              style={{ left: creator.position.left, top: creator.position.top }}
+              onClick={() => handleBubbleClick(creator)}
             >
-              <div className="creator-thumbnail">
-                <div className="play-icon">
-                  <span className="play-arrow">▶</span>
+              <div className="bubble-content">
+                <div 
+                  className="bubble-avatar" 
+                  style={creator.avatar ? 
+                    { backgroundImage: `url(${creator.avatar})` } : 
+                    { background: creator.color }
+                  }
+                >
+                  {!creator.avatar && creator.emoji}
                 </div>
-              </div>
-              <div className="creator-info">
-                <div className="creator-name">{creator.name}</div>
-                <div className="creator-title">{creator.title}</div>
+                <div className="bubble-name">{creator.name}</div>
+                <div className="bubble-match">{creator.match}% match</div>
+                
+                {selectedCreator?.id === creator.id && (
+                  <div className="bubble-metrics">
+                    <div className="metric-item">
+                      <div className="metric-label">Match Pulse</div>
+                      <div className="metric-bar">
+                        <div className="metric-fill" style={{ width: `${creator.metrics.pulse}%` }}></div>
+                      </div>
+                    </div>
+                    <div className="metric-item">
+                      <div className="metric-label">Voice Aura</div>
+                      <div className="metric-bar">
+                        <div className="metric-fill" style={{ width: `${creator.metrics.aura}%` }}></div>
+                      </div>
+                    </div>
+                    <div className="metric-item">
+                      <div className="metric-label">Authenticity</div>
+                      <div className="metric-bar">
+                        <div className="metric-fill" style={{ width: `${creator.metrics.auth}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Navigation Dots */}
-      <div className="nav-dots">
-        {creators.map((_, index) => (
-          <button
-            key={index}
-            className={`dot ${index === carouselIndex ? 'active' : ''}`}
-            onClick={() => setCarouselIndex(index)}
-          />
-        ))}
-      </div>
-
-      {/* Creator Selection Modal */}
-      {showCreatorList && (
-        <div className="modal">
-          <div className="modal-content">
-            <button className="close-btn" onClick={() => setShowCreatorList(false)}>×</button>
-            <h2>Choose Your Path</h2>
-            <p>Select a creator first or write and let AI suggest</p>
-            
-            <div className="options-grid">
-              {/* Option 1: Choose Creator */}
-              <div className="option">
-                <h3>🎯 Choose Creator First</h3>
-                <p>Browse creators and write in their unique voice</p>
-                <div className="creator-list">
-                  {creators.map((creator) => (
-                    <button
-                      key={creator.id}
-                      className="creator-option"
-                      onClick={() => {
-                        setSelectedCreator(creator);
-                        setShowCreatorList(false);
-                      }}
-                    >
-                      <span className="creator-emoji">{creator.emoji}</span>
-                      <div className="creator-option-info">
-                        <div className="creator-option-name">{creator.name}</div>
-                        <div className="creator-option-title">{creator.title}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Option 2: Write First */}
-              <div className="option">
-                <h3>✍️ Write First</h3>
-                <p>Start writing and AI will suggest the best creator voice</p>
-                <button
-                  className="write-first-btn"
-                  onClick={() => {
-                    setShowWritingFirst(true);
-                    setShowCreatorList(false);
-                  }}
-                >
-                  Start Writing →
-                </button>
-                <div className="ai-features">
-                  <div className="ai-feature">✨ AI analyzes your content</div>
-                  <div className="ai-feature">🎯 Matches writing style</div>
-                  <div className="ai-feature">💡 Suggests best creator</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
 
+      {/* Creator Pills */}
+      <div className="creator-pills">
+        <div className="avatar-group">
+          <span className="avatar">👤</span>
+          <span className="avatar">👤</span>
+          <span className="avatar">👤</span>
+        </div>
+        <span className="creator-count">Join 350+ creators</span>
+      </div>
+
       {/* Writing Panel */}
-      <div className={`writing-panel ${selectedCreator || showWritingFirst ? 'active' : ''}`}>
-        {selectedCreator ? (
+      <div className={`writing-panel ${selectedCreator ? 'active' : ''}`}>
+        {selectedCreator && (
           <>
             <div className="writing-panel-header">
               <div className="writing-creator-info">
-                <div className="creator-avatar">{selectedCreator.emoji}</div>
+                <div className="creator-avatar" style={{ background: selectedCreator.color }}>
+                  {selectedCreator.emoji}
+                </div>
                 <div>
                   <h3>{selectedCreator.name}</h3>
                   <p>Writing in {selectedCreator.name}'s voice</p>
                 </div>
               </div>
-              <button className="close-btn" onClick={() => {
-                setSelectedCreator(null);
-                setWritingText('');
-              }}>×</button>
+              <button className="close-btn" onClick={handleCloseWriting}>×</button>
             </div>
             
             <textarea
@@ -200,36 +214,7 @@ function HomePage({ onNavigate }) {
               </button>
             </div>
           </>
-        ) : showWritingFirst ? (
-          <>
-            <div className="writing-panel-header">
-              <div>
-                <h3>Start Writing</h3>
-                <p>Write your content and AI will suggest the best creator voice</p>
-              </div>
-              <button className="close-btn" onClick={() => {
-                setShowWritingFirst(false);
-                setWritingText('');
-              }}>×</button>
-            </div>
-            
-            <textarea
-              className="writing-textarea"
-              placeholder="What would you like to write about?"
-              value={writingText}
-              onChange={(e) => setWritingText(e.target.value)}
-              autoFocus
-            />
-            
-            {writingText.length > 50 && (
-              <div className="ai-suggestion-area">
-                <button className="analyze-btn">
-                  🤖 Analyze & Suggest Best Voice
-                </button>
-              </div>
-            )}
-          </>
-        ) : null}
+        )}
       </div>
     </div>
   );
