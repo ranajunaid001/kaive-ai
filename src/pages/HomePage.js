@@ -1,3 +1,4 @@
+import styles from './HomePage.module.css';
 import React, { useState, useEffect } from 'react';
 
 function HomePage({ onNavigate }) {
