@@ -205,24 +205,24 @@ function Login() {
                 {loading ? 'Sending...' : 'Send Reset Instructions'}
               </button>
               
-              <div className={styles.signupLink}>
-                Remember your password?{' '}
-                <button 
-                  onClick={toggleResetPassword}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#1a1a1a',
-                    fontWeight: '600',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    padding: 0,
-                    font: 'inherit'
-                  }}
-                >
-                  Back to login
-                </button>
-              </div>
+                  <div className={styles.signupLink}>
+                    Remember your password?{' '}
+                    <button 
+                      onClick={toggleResetPassword}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#1a1a1a',
+                        fontWeight: '600',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      Back to login
+                    </button>
+                  </div>
             </form>
           ) : (
             // Regular Login/Signup Form
@@ -286,7 +286,7 @@ function Login() {
           
           {!showResetPassword && (
             <div className={styles.signupLink}>
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              {isSignUp ? 'Already have an account?' : 'Don\'t have an account?'}{' '}
               <button 
                 onClick={toggleMode}
                 style={{
