@@ -1,5 +1,5 @@
-import styles from './HomePage.module.css';
 import React, { useState, useEffect } from 'react';
+import styles from './HomePage.module.css';
 
 function HomePage({ onNavigate }) {
   const [selectedCreator, setSelectedCreator] = useState(null);
@@ -143,15 +143,15 @@ function HomePage({ onNavigate }) {
   };
 
   return (
-    <div className="home-page">
+    <div className={styles.homePage}>
       {/* Navigation */}
-      <nav className="nav glass">
+      <nav className={`${styles.nav} ${styles.glass}`}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <a href="/" className="logo">
-            <div className="logo-icon">K</div>
+          <a href="/" className={styles.logo}>
+            <div className={styles.logoIcon}>K</div>
             <span>Kaive</span>
           </a>
-          <div className="nav-links">
+          <div className={styles.navLinks}>
             <a href="#">Pricing</a>
             <a href="#">Enterprise</a>
           </div>
@@ -162,25 +162,24 @@ function HomePage({ onNavigate }) {
       </nav>
       
       {/* Hero Section */}
-      <section className="hero">
-        <h1>Let's make your content a <span className="highlight">reality.</span><br />Today.</h1>
+      <section className={styles.hero}>
+        <h1>Let's make your content a <span className={styles.highlight}>reality.</span><br />Today.</h1>
         <p>Kaive lets you write authentic LinkedIn posts in minutes with your favorite creator's voice. No prompting necessary.</p>
       </section>
       
       {/* Input Card */}
       {!showResults && !isAnalyzing && (
         <>
-          <div className="input-card" id="inputCard">
+          <div className={styles.inputCard}>
             <textarea 
-              className="input-area" 
-              id="userInput"
+              className={styles.inputArea}
               placeholder="What do you want to write about?"
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               autoFocus
             />
             <button 
-              className={`send-btn ${wordCount >= 20 ? 'active' : ''}`} 
+              className={`${styles.sendBtn} ${wordCount >= 20 ? styles.active : ''}`}
               onClick={analyzeContent}
               disabled={wordCount < 20}
             >
@@ -189,97 +188,103 @@ function HomePage({ onNavigate }) {
               </svg>
             </button>
             
-            <div className="suggestions">
-              <div className="suggestions-label">Not sure where to start? Try one of these:</div>
-              <div className="suggestion-pills">
-                <div className="pill" onClick={() => fillSuggestion('Little Win')}>Little Win</div>
-                <div className="pill" onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
-                <div className="pill" onClick={() => fillSuggestion('Failure')}>Failure</div>
-                <div className="pill" onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
-                <div className="pill" onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
+            <div className={styles.suggestions}>
+              <div className={styles.suggestionsLabel}>Not sure where to start? Try one of these:</div>
+              <div className={styles.suggestionPills}>
+                <div className={styles.pill} onClick={() => fillSuggestion('Little Win')}>Little Win</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('Failure')}>Failure</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
               </div>
             </div>
           </div>
           
           {/* Trust Section */}
-          <div className="trust-section">
-            <div className="trust-avatars">
-              <div className="avatar" style={{ background: '#2196F3' }}>JW</div>
-              <div className="avatar" style={{ background: '#FF6B35' }}>SB</div>
-              <div className="avatar" style={{ background: '#2196F3' }}>DB</div>
+          <div className={styles.trustSection}>
+            <div className={styles.trustAvatars}>
+              <div className={styles.avatar} style={{ background: '#2196F3' }}>JW</div>
+              <div className={styles.avatar} style={{ background: '#FF6B35' }}>SB</div>
+              <div className={styles.avatar} style={{ background: '#2196F3' }}>DB</div>
             </div>
-            <span style={{ fontSize: '14px', color: 'var(--dark)', opacity: 0.7 }}>Trusted by 50K+ writers</span>
+            <span style={{ fontSize: '14px', color: '#1a1a1a', opacity: 0.7 }}>Trusted by 50K+ writers</span>
           </div>
         </>
       )}
       
       {/* Loading State */}
       {isAnalyzing && (
-        <div className="loading show">
-          <div className="spinner"></div>
-          <h3 style={{ fontSize: '24px', color: 'var(--dark)', marginBottom: '8px' }}>Analyzing your writing style</h3>
-          <p style={{ color: 'var(--gray)' }}>Finding the perfect creator match...</p>
+        <div className={`${styles.loading} ${styles.show}`}>
+          <div className={styles.spinner}></div>
+          <h3 style={{ fontSize: '24px', color: '#1a1a1a', marginBottom: '8px' }}>Analyzing your writing style</h3>
+          <p style={{ color: '#666' }}>Finding the perfect creator match...</p>
         </div>
       )}
       
       {/* Results Section */}
       {showResults && (
-        <div className="results-section show">
-          <div className="results-header">
+        <div className={`${styles.resultsSection} ${styles.show}`}>
+          <div className={styles.resultsHeader}>
             <h2>Perfect matches found!</h2>
-            <p style={{ fontSize: '18px', color: 'var(--gray)' }}>Select a creator whose voice resonates with your content</p>
+            <p style={{ fontSize: '18px', color: '#666' }}>Select a creator whose voice resonates with your content</p>
           </div>
           
-          <div className="bubbles-container">
-            {creators.map(creator => (
-              <div 
-                key={creator.id}
-                className={`bubble bubble-${creator.size} ${selectedCreator?.id === creator.id ? 'selected' : ''}`} 
-                style={{ left: creator.position.left, top: creator.position.top }}
-                onClick={() => selectCreator(creator.id)}
-              >
-                <div className="bubble-content">
-                  <div 
-                    className="bubble-avatar" 
-                    style={creator.avatar ? 
-                      { backgroundImage: `url(${creator.avatar})` } : 
-                      { background: creator.color }
-                    }
-                  >
-                    {!creator.avatar && creator.emoji}
-                  </div>
-                  <div className="bubble-name">{creator.name}</div>
-                  <div className="bubble-match">{creator.match}% match</div>
-                  {selectedCreator?.id === creator.id && (
-                    <div className="bubble-metrics">
-                      <div className="metric-item">
-                        <div className="metric-label">Match Pulse</div>
-                        <div className="metric-bar">
-                          <div className="metric-fill" style={{ width: `${creator.metrics.pulse}%` }}></div>
-                        </div>
-                      </div>
-                      <div className="metric-item">
-                        <div className="metric-label">Voice Aura</div>
-                        <div className="metric-bar">
-                          <div className="metric-fill" style={{ width: `${creator.metrics.aura}%` }}></div>
-                        </div>
-                      </div>
-                      <div className="metric-item">
-                        <div className="metric-label">Authenticity</div>
-                        <div className="metric-bar">
-                          <div className="metric-fill" style={{ width: `${creator.metrics.auth}%` }}></div>
-                        </div>
-                      </div>
+          <div className={styles.bubblesContainer}>
+            {creators.map(creator => {
+              const bubbleSizeClass = creator.size === 'large' ? styles.bubbleLarge : 
+                                      creator.size === 'medium' ? styles.bubbleMedium : 
+                                      styles.bubbleSmall;
+              
+              return (
+                <div 
+                  key={creator.id}
+                  className={`${styles.bubble} ${bubbleSizeClass} ${selectedCreator?.id === creator.id ? styles.selected : ''}`}
+                  style={{ left: creator.position.left, top: creator.position.top }}
+                  onClick={() => selectCreator(creator.id)}
+                >
+                  <div className={styles.bubbleContent}>
+                    <div 
+                      className={styles.bubbleAvatar}
+                      style={creator.avatar ? 
+                        { backgroundImage: `url(${creator.avatar})` } : 
+                        { background: creator.color }
+                      }
+                    >
+                      {!creator.avatar && creator.emoji}
                     </div>
-                  )}
+                    <div className={styles.bubbleName}>{creator.name}</div>
+                    <div className={styles.bubbleMatch}>{creator.match}% match</div>
+                    {selectedCreator?.id === creator.id && (
+                      <div className={styles.bubbleMetrics}>
+                        <div className={styles.metricItem}>
+                          <div className={styles.metricLabel}>Match Pulse</div>
+                          <div className={styles.metricBar}>
+                            <div className={styles.metricFill} style={{ width: `${creator.metrics.pulse}%` }}></div>
+                          </div>
+                        </div>
+                        <div className={styles.metricItem}>
+                          <div className={styles.metricLabel}>Voice Aura</div>
+                          <div className={styles.metricBar}>
+                            <div className={styles.metricFill} style={{ width: `${creator.metrics.aura}%` }}></div>
+                          </div>
+                        </div>
+                        <div className={styles.metricItem}>
+                          <div className={styles.metricLabel}>Authenticity</div>
+                          <div className={styles.metricBar}>
+                            <div className={styles.metricFill} style={{ width: `${creator.metrics.auth}%` }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '80px' }}>
             <button 
-              className="btn btn-dark" 
+              className={`${styles.btn} ${styles.btnDark}`}
               disabled={!selectedCreator}
               onClick={generateContent}
             >
@@ -290,25 +295,25 @@ function HomePage({ onNavigate }) {
       )}
       
       {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <div className="testimonials-container">
+      <section className={styles.testimonialsSection}>
+        <div className={styles.testimonialsContainer}>
           {/* Row 1 - Scrolling Left */}
-          <div className="testimonial-row row-1">
+          <div className={`${styles.testimonialRow} ${styles.row1}`}>
             {[...testimonials.slice(0, 4), ...testimonials.slice(0, 4)].map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <p className="testimonial-content">{t.text}</p>
-                <div className="testimonial-author">
-                  <div className="author-info">
+              <div key={i} className={styles.testimonialCard}>
+                <p className={styles.testimonialContent}>{t.text}</p>
+                <div className={styles.testimonialAuthor}>
+                  <div className={styles.authorInfo}>
                     <div 
-                      className="author-avatar" 
+                      className={styles.authorAvatar}
                       style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 1})` }}
                     ></div>
-                    <div className="author-details">
+                    <div className={styles.authorDetails}>
                       <h4>{t.author}</h4>
                       <p>{t.role}</p>
                     </div>
                   </div>
-                  <div className="social-icon">
+                  <div className={styles.socialIcon}>
                     {socialIcons[t.social]}
                   </div>
                 </div>
@@ -317,22 +322,22 @@ function HomePage({ onNavigate }) {
           </div>
           
           {/* Row 2 - Scrolling Right */}
-          <div className="testimonial-row row-2">
+          <div className={`${styles.testimonialRow} ${styles.row2}`}>
             {[...testimonials.slice(4, 8), ...testimonials.slice(4, 8)].map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <p className="testimonial-content">{t.text}</p>
-                <div className="testimonial-author">
-                  <div className="author-info">
+              <div key={i} className={styles.testimonialCard}>
+                <p className={styles.testimonialContent}>{t.text}</p>
+                <div className={styles.testimonialAuthor}>
+                  <div className={styles.authorInfo}>
                     <div 
-                      className="author-avatar" 
+                      className={styles.authorAvatar}
                       style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 5})` }}
                     ></div>
-                    <div className="author-details">
+                    <div className={styles.authorDetails}>
                       <h4>{t.author}</h4>
                       <p>{t.role}</p>
                     </div>
                   </div>
-                  <div className="social-icon">
+                  <div className={styles.socialIcon}>
                     {socialIcons[t.social]}
                   </div>
                 </div>
