@@ -17,7 +17,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showResetPassword, setShowResetPassword] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const handleGoogleLogin = async () => {
     if (!supabase) {
@@ -114,7 +113,6 @@ function Login() {
 
       if (error) throw error;
 
-      setResetEmailSent(true);
       setShowResetPassword(false);
       
       // Show success message
@@ -133,7 +131,6 @@ function Login() {
     setPassword('');
     setConfirmPassword('');
     setShowResetPassword(false);
-    setResetEmailSent(false);
   };
 
   const toggleResetPassword = (e) => {
@@ -270,7 +267,23 @@ function Login() {
               
               {!isSignUp && (
                 <div className={styles.forgotPassword}>
-                  <a href="#" onClick={toggleResetPassword}>Forgot password?</a>
+                  <button 
+                    onClick={toggleResetPassword}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      color: '#86868b',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      font: 'inherit'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#F59E0B'}
+                    onMouseLeave={(e) => e.target.style.color = '#86868b'}
+                  >
+                    Forgot password?
+                  </button>
                 </div>
               )}
               
