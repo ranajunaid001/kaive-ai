@@ -205,24 +205,24 @@ function Login() {
                 {loading ? 'Sending...' : 'Send Reset Instructions'}
               </button>
               
-                  <div className={styles.signupLink}>
-                    Remember your password?{' '}
-                    <button 
-                      onClick={toggleResetPassword}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#1a1a1a',
-                        fontWeight: '600',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        padding: 0,
-                        font: 'inherit'
-                      }}
-                    >
-                      Back to login
-                    </button>
-                  </div>
+              <div className={styles.signupLink}>
+                Remember your password?{' '}
+                <button 
+                  onClick={toggleResetPassword}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#1a1a1a',
+                    fontWeight: '600',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    padding: 0,
+                    font: 'inherit'
+                  }}
+                >
+                  Back to login
+                </button>
+              </div>
             </form>
           ) : (
             // Regular Login/Signup Form
@@ -347,7 +347,7 @@ function Login() {
             <div className={styles.testimonialCard}>
               <p className={styles.testimonialContent}>Finally, an AI tool that gets LinkedIn's unique style. My engagement has tripled since using Kaive!</p>
               <div className={styles.testimonialAuthor}>
-                <div className={styles.authorInfo>
+                <div className={styles.authorInfo}>
                   <div className={styles.authorAvatar} style={{ backgroundImage: 'url(https://i.pravatar.cc/150?img=3)' }}></div>
                   <div className={styles.authorDetails}>
                     <h4>Sarah Chen</h4>
@@ -380,9 +380,9 @@ function Login() {
             </div>
             
             <div className={styles.testimonialCard}>
-              <p className={styles.testimonialContent">I've tried every AI writing tool out there. Kaive is the only one that truly understands LinkedIn's voice.</p>
+              <p className={styles.testimonialContent}>I&apos;ve tried every AI writing tool out there. Kaive is the only one that truly understands LinkedIn&apos;s voice.</p>
               <div className={styles.testimonialAuthor}>
-                <div className={styles.authorInfo">
+                <div className={styles.authorInfo}>
                   <div className={styles.authorAvatar} style={{ backgroundImage: 'url(https://i.pravatar.cc/150?img=6)' }}></div>
                   <div className={styles.authorDetails}>
                     <h4>Alex Thompson</h4>
