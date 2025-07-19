@@ -28,7 +28,7 @@ function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/admin`
+          redirectTo: 'https://app.kaive.xyz'
         }
       });
       
@@ -80,8 +80,8 @@ function Login() {
         
         if (error) throw error;
         
-        // Redirect to admin page on successful login
-        window.location.href = '/admin';
+        // Redirect to app subdomain on successful login
+        window.location.href = 'https://app.kaive.xyz';
       }
     } catch (error) {
       alert(`Error: ${error.message}`);
