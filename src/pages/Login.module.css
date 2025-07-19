@@ -1,0 +1,330 @@
+/* Login.module.css */
+
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Left Section - Login Form */
+.leftSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 40px;
+  min-width: 400px;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 60px;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  background: #F59E0B;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.logoText {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.welcomeText {
+  font-size: 48px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 48px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.loginForm {
+  width: 100%;
+  max-width: 400px;
+}
+
+.googleBtn {
+  width: 100%;
+  padding: 14px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  margin-bottom: 24px;
+}
+
+.googleBtn:hover {
+  background: #000;
+  transform: translateY(-1px);
+}
+
+.googleIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.divider {
+  text-align: center;
+  color: #86868b;
+  margin: 24px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #F59E0B;
+  background: white;
+}
+
+.forgotPassword {
+  text-align: right;
+  margin-top: -12px;
+  margin-bottom: 24px;
+}
+
+.forgotPassword a {
+  color: #86868b;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgotPassword a:hover {
+  color: #F59E0B;
+}
+
+.loginBtn {
+  width: 100%;
+  padding: 14px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginBtn:hover {
+  background: #000;
+  transform: translateY(-1px);
+}
+
+.signupLink {
+  text-align: center;
+  margin-top: 24px;
+  color: #86868b;
+  font-size: 14px;
+}
+
+.signupLink a {
+  color: #1a1a1a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signupLink a:hover {
+  text-decoration: underline;
+}
+
+/* Right Section - Testimonials */
+.rightSection {
+  flex: 1.2;
+  background: linear-gradient(135deg, #e8d5c4 0%, #f5c99b 50%, #ffd6a0 100%);
+  padding: 60px 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.testimonialsContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.testimonialRow {
+  display: flex;
+  gap: 24px;
+  padding: 0 40px;
+  position: relative;
+}
+
+.testimonialCard {
+  flex: 0 0 340px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.testimonialCard:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Cards partially visible at edges */
+.testimonialRow:first-child {
+  transform: translateX(-100px);
+}
+
+.testimonialRow:last-child {
+  transform: translateX(-50px);
+}
+
+.testimonialContent {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.testimonialAuthor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.authorAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.authorDetails h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.authorDetails p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.socialIcon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .testimonialRow {
+    gap: 16px;
+  }
+  
+  .testimonialCard {
+    flex: 0 0 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .rightSection {
+    display: none;
+  }
+  
+  .leftSection {
+    min-width: unset;
+  }
+}
