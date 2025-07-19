@@ -109,7 +109,7 @@ function Login() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://kaive.xyz/reset-password',
+        redirectTo: 'https://app.kaive.xyz',
       });
 
       if (error) throw error;
