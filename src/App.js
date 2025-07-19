@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-
   return (
     <Router>
-      <div className="App">
+      <div className="app">
         <Routes>
-          <Route path="/" element={<HomePage onNavigate={setCurrentPage} />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<AdminPage onNavigate={setCurrentPage} />} />
-          {/* Add more routes as needed */}
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
