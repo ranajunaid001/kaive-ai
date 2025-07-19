@@ -1,666 +1,401 @@
-/* HomePage.module.css */
-
-.homePage {
-  background: linear-gradient(135deg, #c9d6df 0%, #f2f2f2 100%);
-  min-height: 100vh;
-  padding-top: 80px;
-}
-
-/* Navigation */
-.nav {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 24px 48px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 1000;
-}
-
-.glass {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a1a1a;
-  text-decoration: none;
-}
-
-.logoIcon {
-  width: 32px;
-  height: 32px;
-  background: #F59E0B;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.navLinks {
-  display: flex;
-  gap: 36px;
-  margin-left: 48px;
-}
-
-.navLinks a {
-  color: #1a1a1a;
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-
-.navLinks a:hover {
-  opacity: 0.7;
-}
-
-.navButton {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-}
-
-.navButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-
-/* Hero Section */
-.hero {
-  text-align: center;
-  padding: 60px 20px 30px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.hero h1 {
-  font-size: clamp(48px, 8vw, 72px);
-  font-weight: 600;
-  line-height: 1.1;
-  color: #1a1a1a;
-  margin-bottom: 16px;
-}
-
-.highlight {
-  color: #F59E0B;
-}
-
-.hero p {
-  font-size: 20px;
-  color: #1a1a1a;
-  opacity: 0.8;
-}
-
-/* Input Card - With proper bottom spacing */
-.inputCard {
-  max-width: 820px;
-  margin: 0 auto 60px; /* Increased from 40px for more bottom spacing */
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  position: relative;
-}
-
-.inputArea {
-  width: 100%;
-  min-height: 180px;
-  border: none;
-  outline: none;
-  font-size: 18px;
-  color: #1a1a1a;
-  resize: none;
-  font-family: inherit;
-  background: rgba(248, 249, 250, 0.9);
-  padding: 20px;
-  border-radius: 12px;
-  transition: background 0.2s;
-}
-
-.inputArea:focus {
-  background: rgba(240, 242, 245, 0.95);
-}
-
-.sendBtn {
-  position: absolute;
-  bottom: 20px;
-  right: 50px;
-  width: 48px;
-  height: 48px;
-  background: #F59E0B;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.sendBtn.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.sendBtn:hover {
-  transform: scale(1.1);
-  background: #D97706;
-}
-
-/* Suggestions */
-.suggestions {
-  margin-top: 40px;
-}
-
-.suggestionsLabel {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 20px;
-}
-
-.suggestionPills {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.pill {
-  padding: 10px 20px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 100px;
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.pill:hover {
-  background: white;
-  border-color: #2196F3;
-  color: #1a1a1a;
-}
-
-/* Trust Section */
-.trustSection {
-  text-align: center;
-  margin: 40px auto 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.trustAvatars {
-  display: flex;
-  margin-right: 8px;
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid white;
-  margin-left: -8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: white;
-  font-weight: 600;
-}
-
-.avatar:first-child {
-  margin-left: 0;
-}
-
-/* Loading State */
-.loading {
-  display: none;
-  text-align: center;
-  padding: 80px 20px;
-}
-
-.loading.show {
-  display: block;
-}
-
-.show {
-  display: block !important;
-}
-
-.spinner {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 32px;
-  border: 3px solid transparent;
-  border-top-color: #2196F3;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Results Section */
-.resultsSection {
-  display: none;
-  padding: 0 20px;
-}
-
-.resultsSection.show {
-  display: block;
-}
-
-.resultsHeader {
-  text-align: center;
-  margin-bottom: 48px;
-}
-
-.resultsHeader h2 {
-  font-size: 32px;
-  font-weight: 300;
-  color: #1d1d1f;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-}
-
-.resultsHeader p {
-  font-size: 17px;
-  color: #86868b;
-  font-weight: 400;
-}
-
-/* Container for bubbles - REDUCED HEIGHT */
-.container {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  height: 500px; /* Reduced from 700px to fit all bubbles in viewport */
-  margin: 0 auto;
-}
-
-/* Bubble styles */
-.bubble {
-  position: absolute;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(251, 191, 36, 0.03) 100%);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 0.5px solid rgba(251, 191, 36, 0.08);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  box-shadow: 
-    0 4px 20px rgba(251, 191, 36, 0.02),
-    0 8px 40px rgba(0, 0, 0, 0.02),
-    inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  z-index: 1;
-}
-
-/* Circular state - Size based on match percentage */
-.bubble.circle {
-  border-radius: 50%;
-  padding: 20px;
-}
-
-/* Dynamic sizing based on match rate */
-.bubble[data-match="94"] { width: 170px; height: 170px; }
-.bubble[data-match="91"] { width: 164px; height: 164px; }
-.bubble[data-match="89"] { width: 160px; height: 160px; }
-.bubble[data-match="87"] { width: 156px; height: 156px; }
-.bubble[data-match="85"] { width: 153px; height: 153px; }
-.bubble[data-match="83"] { width: 150px; height: 150px; }
-.bubble[data-match="81"] { width: 147px; height: 147px; }
-
-/* Expanded state */
-.bubble.expanded {
-  border-radius: 32px;
-  padding: 40px 48px;
-  width: 380px !important;
-  height: auto !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(251, 191, 36, 0.02) 100%);
-  box-shadow: 
-    0 12px 48px rgba(251, 191, 36, 0.08),
-    0 24px 96px rgba(0, 0, 0, 0.06),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8);
-  z-index: 100;
-  animation: none;
-  transform: translateY(-4px) scale(1);
-}
-
-/* Adjust expansion direction for edge bubbles */
-.bubble:nth-child(2).expanded { /* Gary - top right */
-  transform: translateX(-50%) translateY(-4px);
-}
-
-.bubble:nth-child(5).expanded { /* Steve - right middle */
-  transform: translateX(-60%) translateY(-4px);
-}
-
-.bubble:nth-child(7).expanded { /* Reno - bottom right */
-  transform: translateX(-40%) translateY(-80%);
-}
-
-.bubble:nth-child(6).expanded { /* Jasmin - bottom left */
-  transform: translateY(-80%);
-}
-
-/* Push other bubbles back when one is selected */
-.bubble.pushedBack {
-  z-index: 0;
-  opacity: 0.4;
-  filter: blur(1px);
-  transform: scale(0.95);
-}
-
-.bubble:hover:not(.expanded):not(.pushedBack) {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 
-    0 8px 30px rgba(251, 191, 36, 0.06),
-    0 16px 60px rgba(0, 0, 0, 0.03);
-}
-
-/* Content */
-.initials {
-  font-size: 32px;
-  font-weight: 200;
-  color: #1d1d1f;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  opacity: 0.9;
-}
-
-.name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #1d1d1f;
-  margin-bottom: 2px;
-  letter-spacing: -0.01em;
-}
-
-.title {
-  font-size: 12px;
-  font-weight: 400;
-  color: #86868b;
-  letter-spacing: -0.01em;
-}
-
-.match {
-  margin-top: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #F59E0B;
-  letter-spacing: 0.02em;
-  background: rgba(251, 191, 36, 0.08);
-  padding: 4px 12px;
-  border-radius: 12px;
-}
-
-/* Expanded content */
-.expandedContent {
-  display: none;
-  margin-top: 24px;
-  width: 100%;
-}
-
-.bubble.expanded .expandedContent {
-  display: block;
-}
-
-.divider {
-  height: 0.5px;
-  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.1), transparent);
-  margin: 24px 0;
-}
-
-.metric {
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.metricLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: #86868b;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-}
-
-.metricBar {
-  height: 4px;
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 2px;
-  overflow: hidden;
-  position: relative;
-}
-
-.metricFill {
-  height: 100%;
-  background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
-  border-radius: 2px;
-  transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-  box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
-}
-
-/* Generate Post Button inside expanded card */
-.generateBtn {
-  width: 100%;
-  padding: 16px 24px;
-  background: #1a1a1a;
-  color: white;
-  border: none;
-  border-radius: 100px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 24px;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.generateBtn:hover {
-  background: #000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.generateBtn:active {
-  transform: translateY(0);
-}
-
-/* Subtle breathing animation */
-@keyframes breathe {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.bubble:not(.expanded):not(.pushedBack) {
-  animation: breathe 4s ease-in-out infinite;
-}
-
-/* Close button for expanded bubble */
-.closeBtn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 28px;
-  height: 28px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.04);
-  border: none;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  color: #86868b;
-  font-size: 18px;
-  line-height: 1;
-}
-
-.bubble.expanded .closeBtn {
-  display: flex;
-}
-
-.closeBtn:hover {
-  background: rgba(0, 0, 0, 0.08);
-  color: #1d1d1f;
-}
-
-/* Testimonials */
-.testimonialsSection {
-  padding: 100px 0;
-  overflow: hidden;
-  position: relative;
-}
-
-.testimonialsContainer {
-  position: relative;
-  height: 500px;
-}
-
-.testimonialRow {
-  display: flex;
-  gap: 32px;
-  position: absolute;
-  width: max-content;
-  padding: 16px 0;
-}
-
-.row1 {
-  top: 0;
-  animation: scrollLeft 50s linear infinite;
-}
-
-.row2 {
-  top: 250px;
-  animation: scrollRight 50s linear infinite;
-}
-
-@keyframes scrollLeft {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes scrollRight {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
-}
-
-.testimonialCard {
-  background: white;
-  border-radius: 24px;
-  padding: 32px;
-  width: 380px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
-}
-
-.testimonialContent {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #333;
-  margin-bottom: 24px;
-}
-
-.testimonialAuthor {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.authorInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.authorAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-}
-
-.authorDetails h4 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  color: #1a1a1a;
-}
-
-.authorDetails p {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-}
-
-.socialIcon {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .nav { padding: 16px 24px; }
-  .navLinks { display: none; }
-  .hero h1 { font-size: 36px; }
-  .hero { padding: 60px 20px 30px; }
-  .inputCard { margin: 0 auto 40px; }
-  .testimonialCard { min-width: 300px; }
-  .container { height: 600px; }
-  
-  /* Smaller bubbles on mobile */
-  .bubble[data-match="94"] { width: 140px; height: 140px; }
-  .bubble[data-match="91"] { width: 134px; height: 134px; }
-  .bubble[data-match="89"] { width: 130px; height: 130px; }
-  .bubble[data-match="87"] { width: 126px; height: 126px; }
-  .bubble[data-match="85"] { width: 123px; height: 123px; }
-  .bubble[data-match="83"] { width: 120px; height: 120px; }
-  .bubble[data-match="81"] { width: 117px; height: 117px; }
-  
-  /* Adjust expanded card width on mobile */
-  .bubble.expanded {
-    width: 320px !important;
-    padding: 30px;
-  }
-}
+import React, { useState, useEffect } from 'react';
+import styles from './HomePage.module.css';
+
+function HomePage({ onNavigate }) {
+  const [selectedCreator, setSelectedCreator] = useState(null);
+  const [userInput, setUserInput] = useState('');
+  const [showResults, setShowResults] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
+
+  const creators = [
+    { 
+      id: 1, 
+      initials: 'SS',
+      name: 'Simon Sinek', 
+      title: 'Leadership Expert', 
+      tone: 'Inspirational, Purpose-driven', 
+      match: 94,
+      metrics: { 
+        voice: 94,
+        authenticity: 96,
+        engagement: 92
+      }
+    },
+    { 
+      id: 2, 
+      initials: 'GV',
+      name: 'Gary Vaynerchuk', 
+      title: 'CEO & Entrepreneur', 
+      tone: 'Direct, Motivational', 
+      match: 91,
+      metrics: { 
+        voice: 91,
+        authenticity: 91,
+        engagement: 90
+      }
+    },
+    { 
+      id: 3, 
+      initials: 'JW',
+      name: 'Justin Welsh', 
+      title: 'Solopreneur', 
+      tone: 'Tactical, Growth-focused', 
+      match: 89,
+      metrics: { 
+        voice: 89,
+        authenticity: 89,
+        engagement: 88
+      }
+    },
+    { 
+      id: 4, 
+      initials: 'BM',
+      name: 'Ben Meer', 
+      title: 'Systems Thinker', 
+      tone: 'Analytical, Strategic', 
+      match: 87,
+      metrics: { 
+        voice: 87,
+        authenticity: 87,
+        engagement: 86
+      }
+    },
+    { 
+      id: 5, 
+      initials: 'SB',
+      name: 'Steve Bartlett', 
+      title: 'Podcast Host & CEO', 
+      tone: 'Vulnerable, Authentic', 
+      match: 85,
+      metrics: { 
+        voice: 85,
+        authenticity: 83,
+        engagement: 84
+      }
+    },
+    { 
+      id: 6, 
+      initials: 'JA',
+      name: 'Jasmin Alic', 
+      title: 'Brand Strategist', 
+      tone: 'Creative, Strategic', 
+      match: 83,
+      metrics: { 
+        voice: 83,
+        authenticity: 82,
+        engagement: 83
+      }
+    },
+    { 
+      id: 7, 
+      initials: 'RP',
+      name: 'Reno Perry', 
+      title: 'Content Creator', 
+      tone: 'Engaging, Conversational', 
+      match: 81,
+      metrics: { 
+        voice: 81,
+        authenticity: 80,
+        engagement: 81
+      }
+    }
+  ];
+
+  const testimonials = [
+    { text: "Kaive has transformed my LinkedIn game. I write 10x faster while maintaining my authentic voice. Absolutely incredible!", author: "Maria Martin", role: "@maria_martin", social: "twitter" },
+    { text: "Just built this awesome content strategy using Kaive! The AI understands context like no other tool I've used.", author: "Gleb Konon", role: "Product Designer", social: "linkedin" },
+    { text: "What makes Kaive different is that it actually captures my writing style. It's like having a personal writing assistant.", author: "Richard Manisa", role: "Content Creator", social: "linkedin" },
+    { text: "Finally, an AI tool that gets LinkedIn's unique style. My engagement has tripled since using Kaive!", author: "Sarah Chen", role: "Marketing Director", social: "linkedin" },
+    { text: "The fastest content creation moment I have ever had. From idea to polished post in under 2 minutes!", author: "Erel Cohen", role: "Entrepreneur", social: "twitter" },
+    { text: "Kaive revolutionizes content creation by matching your voice with proven creator styles. Game changer!", author: "Eran Cohen", role: "Growth Expert", social: "linkedin" },
+    { text: "Amazing understanding of context and nuance. It's like the AI actually gets what I'm trying to say.", author: "Ariel Mills", role: "Writer", social: "medium" },
+    { text: "I've tried every AI writing tool out there. Kaive is the only one that truly understands LinkedIn's voice.", author: "Alex Thompson", role: "CEO & Founder", social: "twitter" }
+  ];
+
+  const suggestionPrompts = {
+    'Little Win': "Today I closed my first client after 47 cold emails. It's not a million dollar deal, but it's proof that persistence pays off.",
+    'Personal Growth': "I used to avoid difficult conversations at all costs. This week I learned that having them early saves everyone time and stress.",
+    'Failure': "My product launch flopped with zero sales on day one. Here's what I learned about market validation the hard way.",
+    'Learning': "I spent $10K on Facebook ads with terrible results. But the data taught me something valuable about my target audience.",
+    'AI Tool': "I just discovered an AI tool that saved me 10 hours this week. Here's how I'm using it to automate my content research process."
+  };
+
+  useEffect(() => {
+    const words = userInput.trim().split(/\s+/).filter(w => w.length > 0).length;
+    setWordCount(words);
+  }, [userInput]);
+
+  const checkAuth = () => {
+    // Check if user is authenticated
+    const isAuthenticated = localStorage.getItem('kaive_auth_token');
+    return isAuthenticated;
+  };
+
+  const fillSuggestion = (key) => {
+    setUserInput(suggestionPrompts[key]);
+  };
+
+  const analyzeContent = () => {
+    if (wordCount < 20) return;
+    
+    setIsAnalyzing(true);
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setShowResults(true);
+    }, 2500);
+  };
+
+  const toggleBubble = (bubble) => {
+    if (selectedCreator?.id === bubble.id) {
+      setSelectedCreator(null);
+    } else {
+      setSelectedCreator(bubble);
+    }
+  };
+
+  const closeBubble = (event, creatorId) => {
+    event.stopPropagation();
+    if (selectedCreator?.id === creatorId) {
+      setSelectedCreator(null);
+    }
+  };
+
+  const generateContent = () => {
+    if (!selectedCreator) return;
+    
+    // Store the selected creator and user input for the app page
+    sessionStorage.setItem('selectedCreator', JSON.stringify(selectedCreator));
+    sessionStorage.setItem('userInput', userInput);
+    
+    // Check authentication
+    if (checkAuth()) {
+      // User is logged in, go to app page
+      window.location.href = 'https://app.kaive.xyz';
+    } else {
+      // User is not logged in, go to login page
+      window.location.href = '/login';
+    }
+  };
+
+  const socialIcons = {
+    twitter: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    ),
+    linkedin: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+    ),
+    medium: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
+        <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>
+      </svg>
+    )
+  };
+
+  return (
+    <div className={styles.homePage}>
+      {/* Navigation */}
+      <nav className={`${styles.nav} ${styles.glass}`}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <a href="/" className={styles.logo}>
+            <div className={styles.logoIcon}>K</div>
+            <span>Kaive</span>
+          </a>
+          <div className={styles.navLinks}>
+            <a href="/pricing">Pricing</a>
+            <a href="/enterprise">Enterprise</a>
+          </div>
+        </div>
+        <button className={styles.navButton} onClick={() => onNavigate('admin')}>
+          Admin
+        </button>
+      </nav>
+      
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <h1>Give voice to your <span className={styles.highlight}>story</span></h1>
+        <p>Kaive lets you write authentic LinkedIn posts in minutes with your favorite creator's voice. No prompting necessary.</p>
+      </section>
+      
+      {/* Input Card */}
+      {!showResults && !isAnalyzing && (
+        <>
+          <div className={styles.inputCard}>
+            <textarea 
+              className={styles.inputArea}
+              placeholder="What do you want to write about?"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              autoFocus
+            />
+            <button 
+              className={`${styles.sendBtn} ${wordCount >= 20 ? styles.active : ''}`}
+              onClick={analyzeContent}
+              disabled={wordCount < 20}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M7 11L12 6L17 11M12 6V18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
+            
+            <div className={styles.suggestions}>
+              <div className={styles.suggestionsLabel}>Not sure where to start? Try one of these:</div>
+              <div className={styles.suggestionPills}>
+                <div className={styles.pill} onClick={() => fillSuggestion('Little Win')}>Little Win</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('Failure')}>Failure</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
+                <div className={styles.pill} onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Trust Section */}
+          <div className={styles.trustSection}>
+            <div className={styles.trustAvatars}>
+              <div className={styles.avatar} style={{ background: '#2196F3' }}>JW</div>
+              <div className={styles.avatar} style={{ background: '#FF6B35' }}>SB</div>
+              <div className={styles.avatar} style={{ background: '#2196F3' }}>DB</div>
+            </div>
+            <span style={{ fontSize: '14px', color: '#1a1a1a', opacity: 0.7 }}>Trusted by 50K+ writers</span>
+          </div>
+        </>
+      )}
+      
+      {/* Loading State */}
+      {isAnalyzing && (
+        <div className={`${styles.loading} ${styles.show}`}>
+          <div className={styles.spinner}></div>
+          <h3 style={{ fontSize: '24px', color: '#1a1a1a', marginBottom: '8px' }}>Analyzing your writing style</h3>
+          <p style={{ color: '#666' }}>Finding the perfect creator match...</p>
+        </div>
+      )}
+      
+      {/* Results Section */}
+      {showResults && (
+        <div className={`${styles.resultsSection} ${styles.show}`}>
+          <div className={styles.resultsHeader}>
+            <h2>Select your voice</h2>
+            <p>Choose a creator whose style resonates with your content</p>
+          </div>
+          
+          <div className={styles.container}>
+            {creators.map((creator, index) => (
+              <div 
+                key={creator.id}
+                className={`${styles.bubble} ${selectedCreator?.id === creator.id ? styles.expanded : styles.circle} ${selectedCreator && selectedCreator.id !== creator.id ? styles.pushedBack : ''}`}
+                data-match={creator.match}
+                onClick={() => toggleBubble(creator)}
+                style={{
+                  animationDelay: `${index * 0.3}s`,
+                  // Adjusted positions to fit within 500px height
+                  left: `${[25, 70, 10, 50, 85, 35, 65][index]}%`,
+                  top: `${[15, 10, 35, 30, 40, 55, 60][index]}%`
+                }}
+              >
+                <button 
+                  className={styles.closeBtn} 
+                  onClick={(e) => closeBubble(e, creator.id)}
+                >
+                  ×
+                </button>
+                <div className={styles.initials}>{creator.initials}</div>
+                <div className={styles.name}>{creator.name}</div>
+                <div className={styles.title}>{creator.title}</div>
+                <div className={styles.match}>{creator.match}% match</div>
+                
+                <div className={styles.expandedContent}>
+                  <div className={styles.divider}></div>
+                  <div className={styles.metric}>
+                    <div className={styles.metricLabel}>Voice Match</div>
+                    <div className={styles.metricBar}>
+                      <div className={styles.metricFill} style={{ width: `${creator.metrics.voice}%` }}></div>
+                    </div>
+                  </div>
+                  <div className={styles.metric}>
+                    <div className={styles.metricLabel}>Authenticity</div>
+                    <div className={styles.metricBar}>
+                      <div className={styles.metricFill} style={{ width: `${creator.metrics.authenticity}%` }}></div>
+                    </div>
+                  </div>
+                  <div className={styles.metric}>
+                    <div className={styles.metricLabel}>Engagement</div>
+                    <div className={styles.metricBar}>
+                      <div className={styles.metricFill} style={{ width: `${creator.metrics.engagement}%` }}></div>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    className={styles.generateBtn}
+                    onClick={generateContent}
+                  >
+                    Generate Post
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Testimonials Section */}
+      <section className={styles.testimonialsSection}>
+        <div className={styles.testimonialsContainer}>
+          {/* Row 1 - Scrolling Left */}
+          <div className={`${styles.testimonialRow} ${styles.row1}`}>
+            {[...testimonials.slice(0, 4), ...testimonials.slice(0, 4)].map((t, i) => (
+              <div key={i} className={styles.testimonialCard}>
+                <p className={styles.testimonialContent}>{t.text}</p>
+                <div className={styles.testimonialAuthor}>
+                  <div className={styles.authorInfo}>
+                    <div 
+                      className={styles.authorAvatar}
+                      style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 1})` }}
+                    ></div>
+                    <div className={styles.authorDetails}>
+                      <h4>{t.author}</h4>
+                      <p>{t.role}</p>
+                    </div>
+                  </div>
+                  <div className={styles.socialIcon}>
+                    {socialIcons[t.social]}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Row 2 - Scrolling Right */}
+          <div className={`${styles.testimonialRow} ${styles.row2}`}>
+            {[...testimonials.slice(4, 8), ...testimonials.slice(4, 8)].map((t, i) => (
+              <div key={i} className={styles.testimonialCard}>
+                <p className={styles.testimonialContent}>{t.text}</p>
+                <div className={styles.testimonialAuthor}>
+                  <div className={styles.authorInfo}>
+                    <div 
+                      className={styles.authorAvatar}
+                      style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 5})` }}
+                    ></div>
+                    <div className={styles.authorDetails}>
+                      <h4>{t.author}</h4>
+                      <p>{t.role}</p>
+                    </div>
+                  </div>
+                  <div className={styles.socialIcon}>
+                    {socialIcons[t.social]}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default HomePage;
