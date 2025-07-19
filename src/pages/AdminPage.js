@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styles from './AdminPage.module.css';
 
 function AdminPage({ onNavigate }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -97,55 +98,55 @@ function AdminPage({ onNavigate }) {
   };
 
   return (
-    <div className="admin-page">
+    <div className={styles.adminPage}>
       {/* Navigation */}
-      <nav className="admin-nav">
-        <h1 className="logo">Kaive AI</h1>
-        <button className="back-btn" onClick={() => onNavigate('home')}>
+      <nav className={styles.adminNav}>
+        <h1 className={styles.logo}>Kaive AI</h1>
+        <button className={styles.backBtn} onClick={() => onNavigate('home')}>
           Back to Home
         </button>
       </nav>
 
-      <div className="admin-container">
+      <div className={styles.container}>
         {/* Hero */}
-        <div className="admin-hero">
+        <div className={styles.adminHero}>
           <h1>Creator Management</h1>
           <p>Elegantly manage your AI-powered creator voices</p>
         </div>
 
         {/* Stats - Now showing real data */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-number">{stats.unique_authors}</div>
-            <div className="stat-label">Creators</div>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statNumber}>{stats.unique_authors}</div>
+            <div className={styles.statLabel}>Creators</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{stats.total_posts.toLocaleString()}</div>
-            <div className="stat-label">Posts</div>
+          <div className={styles.statCard}>
+            <div className={styles.statNumber}>{stats.total_posts.toLocaleString()}</div>
+            <div className={styles.statLabel}>Posts</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{stats.files_processed}</div>
-            <div className="stat-label">Files</div>
+          <div className={styles.statCard}>
+            <div className={styles.statNumber}>{stats.files_processed}</div>
+            <div className={styles.statLabel}>Files</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">98%</div>
-            <div className="stat-label">Accuracy</div>
+          <div className={styles.statCard}>
+            <div className={styles.statNumber}>98%</div>
+            <div className={styles.statLabel}>Accuracy</div>
           </div>
         </div>
 
         {/* Upload Section */}
-        <div className="upload-section">
-          <h2 className="section-title">Import Creator Data</h2>
+        <div className={styles.uploadSection}>
+          <h2 className={styles.sectionTitle}>Import Creator Data</h2>
           <div 
-            className={`upload-zone ${isDragging ? 'dragging' : ''} ${isUploading ? 'uploading' : ''}`}
+            className={`${styles.uploadZone} ${isDragging ? styles.dragging : ''} ${isUploading ? styles.uploading : ''}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
           >
-            <div className="upload-icon">📊</div>
+            <div className={styles.uploadIcon}>📊</div>
             <h3>{isUploading ? 'Processing...' : 'Drop Excel files here'}</h3>
             <p>{isUploading ? 'Please wait while we process your file' : 'Import LinkedIn creator profiles with a simple drag'}</p>
-            <label className="upload-btn" style={{ opacity: isUploading ? 0.5 : 1, pointerEvents: isUploading ? 'none' : 'auto' }}>
+            <label className={styles.uploadBtn} style={{ opacity: isUploading ? 0.5 : 1, pointerEvents: isUploading ? 'none' : 'auto' }}>
               {isUploading ? 'Processing...' : 'Select Files'}
               <input
                 type="file"
@@ -160,12 +161,12 @@ function AdminPage({ onNavigate }) {
 
           {/* Uploaded Files List */}
           {uploadedFiles.length > 0 && (
-            <div className="uploaded-files">
+            <div className={styles.uploadedFiles}>
               <h3>Uploaded Files:</h3>
               {uploadedFiles.map((file, index) => (
-                <div key={index} className="file-item">
+                <div key={index} className={styles.fileItem}>
                   <span>📄 {file.name}</span>
-                  <span className="file-size">{(file.size / 1024).toFixed(1)} KB</span>
+                  <span className={styles.fileSize}>{(file.size / 1024).toFixed(1)} KB</span>
                 </div>
               ))}
             </div>
@@ -173,56 +174,56 @@ function AdminPage({ onNavigate }) {
         </div>
 
         {/* Creators Grid */}
-        <div className="creators-section">
-          <div className="creators-header">
-            <h2 className="section-title">Active Creators</h2>
-            <div className="search-box">
-              <span className="search-icon">🔍</span>
+        <div className={styles.creatorsSection}>
+          <div className={styles.creatorsHeader}>
+            <h2 className={styles.sectionTitle}>Active Creators</h2>
+            <div className={styles.searchBox}>
+              <span className={styles.searchIcon}>🔍</span>
               <input
                 type="text"
                 placeholder="Search creators..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
+                className={styles.searchInput}
               />
             </div>
           </div>
 
-          <div className="creators-grid">
+          <div className={styles.creatorsGrid}>
             {creators
               .filter(creator => 
                 creator.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 creator.title.toLowerCase().includes(searchQuery.toLowerCase())
               )
               .map((creator) => (
-                <div key={creator.id} className="admin-creator-card">
-                  <div className="creator-card-header">
-                    <div className="creator-avatar">{creator.emoji}</div>
-                    <div className="creator-details">
+                <div key={creator.id} className={styles.creatorCard}>
+                  <div className={styles.creatorCardHeader}>
+                    <div className={styles.creatorAvatar}>{creator.emoji}</div>
+                    <div className={styles.creatorDetails}>
                       <h3>{creator.name}</h3>
                       <p>{creator.title}</p>
                     </div>
                   </div>
 
-                  <div className="creator-stats">
-                    <div className="creator-stat">
-                      <span className="creator-stat-value">{creator.posts}</span>
-                      <span className="creator-stat-label">Posts</span>
+                  <div className={styles.creatorStats}>
+                    <div className={styles.creatorStat}>
+                      <span className={styles.creatorStatValue}>{creator.posts}</span>
+                      <span className={styles.creatorStatLabel}>Posts</span>
                     </div>
-                    <div className="creator-stat">
-                      <span className="creator-stat-value">{creator.match}</span>
-                      <span className="creator-stat-label">Match</span>
+                    <div className={styles.creatorStat}>
+                      <span className={styles.creatorStatValue}>{creator.match}</span>
+                      <span className={styles.creatorStatLabel}>Match</span>
                     </div>
-                    <div className="creator-stat">
-                      <span className="creator-stat-value">{creator.rating}</span>
-                      <span className="creator-stat-label">Rating</span>
+                    <div className={styles.creatorStat}>
+                      <span className={styles.creatorStatValue}>{creator.rating}</span>
+                      <span className={styles.creatorStatLabel}>Rating</span>
                     </div>
                   </div>
 
-                  <div className="creator-actions">
-                    <button className="action-btn">View</button>
-                    <button className="action-btn">Edit</button>
-                    <button className="action-btn delete">Remove</button>
+                  <div className={styles.creatorActions}>
+                    <button className={styles.actionBtn}>View</button>
+                    <button className={styles.actionBtn}>Edit</button>
+                    <button className={`${styles.actionBtn} ${styles.delete}`}>Remove</button>
                   </div>
                 </div>
               ))}
