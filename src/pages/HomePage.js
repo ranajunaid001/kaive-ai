@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './HomePage.module.css';
 
 function HomePage({ onNavigate }) {
-  const navigate = useNavigate();
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [userInput, setUserInput] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -176,7 +174,7 @@ function HomePage({ onNavigate }) {
       window.location.href = 'https://app.kaive.xyz';
     } else {
       // User is not logged in, go to login page
-      navigate('/login');
+      window.location.href = '/login';
     }
   };
 
@@ -219,7 +217,7 @@ function HomePage({ onNavigate }) {
       
       {/* Hero Section */}
       <section className={styles.hero}>
-        <h1>Let's make your content a <span className={styles.highlight}>reality.</span><br />Today.</h1>
+        <h1>Let's make your content a <span className={styles.highlight}>reality.</span></h1>
         <p>Kaive lets you write authentic LinkedIn posts in minutes with your favorite creator's voice. No prompting necessary.</p>
       </section>
       
