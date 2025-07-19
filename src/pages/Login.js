@@ -50,14 +50,14 @@ function Login() {
             </div>
             
             <div className={styles.forgotPassword}>
-              <a href="#">Forgot password?</a>
+              <a href="/forgot-password">Forgot password?</a>
             </div>
             
             <button type="submit" className={styles.loginBtn}>Log In</button>
           </form>
           
           <div className={styles.signupLink}>
-            Don't have an account? <a href="#">Sign up</a>
+            Don't have an account? <a href="/signup">Sign up</a>
           </div>
         </div>
       </div>
