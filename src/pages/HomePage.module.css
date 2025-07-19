@@ -477,18 +477,26 @@
   background: #1a1a1a;
   color: white;
   border: none;
-  border-radius: 16px;
+  border-radius: 100px; /* Changed to match your design system */
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 24px;
+  outline: none; /* Remove any outline */
+  appearance: none; /* Reset browser defaults */
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .generateBtn:hover {
   background: #000;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.generateBtn:active {
+  transform: translateY(0);
 }
 
 /* Subtle breathing animation */
