@@ -217,7 +217,7 @@ function HomePage({ onNavigate }) {
       
       {/* Hero Section */}
       <section className={styles.hero}>
-        <h1>Let's make your content a <span className={styles.highlight}>reality.</span></h1>
+        <h1>Give voice to your <span className={styles.highlight}>story</span></h1>
         <p>Kaive lets you write authentic LinkedIn posts in minutes with your favorite creator's voice. No prompting necessary.</p>
       </section>
       
@@ -292,9 +292,9 @@ function HomePage({ onNavigate }) {
                 onClick={() => toggleBubble(creator)}
                 style={{
                   animationDelay: `${index * 0.3}s`,
-                  // World map-like distribution
+                  // Adjusted positions to fit within 500px height
                   left: `${[25, 70, 10, 50, 85, 35, 65][index]}%`,
-                  top: `${[20, 15, 45, 40, 55, 70, 75][index]}%`
+                  top: `${[15, 10, 35, 30, 40, 55, 60][index]}%`
                 }}
               >
                 <button 
