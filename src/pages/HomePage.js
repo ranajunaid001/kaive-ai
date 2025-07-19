@@ -152,11 +152,11 @@ function HomePage({ onNavigate }) {
             <span>Kaive</span>
           </a>
           <div className={styles.navLinks}>
-            <a href="#">Pricing</a>
-            <a href="#">Enterprise</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/enterprise">Enterprise</a>
           </div>
         </div>
-        <button className="nav-button" onClick={() => onNavigate('admin')}>
+        <button className={styles.navButton} onClick={() => onNavigate('admin')}>
           Admin
         </button>
       </nav>
