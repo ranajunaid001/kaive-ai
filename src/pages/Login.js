@@ -347,7 +347,7 @@ function Login() {
             <div className={styles.testimonialCard}>
               <p className={styles.testimonialContent}>Finally, an AI tool that gets LinkedIn's unique style. My engagement has tripled since using Kaive!</p>
               <div className={styles.testimonialAuthor}>
-                <div className={styles.authorInfo">
+                <div className={styles.authorInfo>
                   <div className={styles.authorAvatar} style={{ backgroundImage: 'url(https://i.pravatar.cc/150?img=3)' }}></div>
                   <div className={styles.authorDetails}>
                     <h4>Sarah Chen</h4>
