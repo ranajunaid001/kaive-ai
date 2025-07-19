@@ -281,10 +281,212 @@
 }
 
 .resultsHeader h2 {
-  font-size: 48px;
+  font-size: 32px;
+  font-weight: 300;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.resultsHeader p {
+  font-size: 17px;
+  color: #86868b;
+  font-weight: 400;
+}
+
+/* Container for bubbles */
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 600px;
+  margin: 0 auto;
+}
+
+/* Jony Ive Inspired Bubble with subtle amber accent */
+.bubble {
+  position: absolute;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(251, 191, 36, 0.03) 100%);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(251, 191, 36, 0.08);
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 
+    0 4px 20px rgba(251, 191, 36, 0.02),
+    0 8px 40px rgba(0, 0, 0, 0.02),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}
+
+/* Circular state - Size based on match percentage */
+.bubble.circle {
+  border-radius: 50%;
+  padding: 20px;
+}
+
+/* Dynamic sizing based on match rate */
+.bubble[data-match="94"] { width: 170px; height: 170px; }
+.bubble[data-match="91"] { width: 164px; height: 164px; }
+.bubble[data-match="89"] { width: 160px; height: 160px; }
+.bubble[data-match="87"] { width: 156px; height: 156px; }
+.bubble[data-match="85"] { width: 153px; height: 153px; }
+
+/* Expanded state */
+.bubble.expanded {
+  border-radius: 32px;
+  padding: 40px 48px;
+  width: auto !important;
+  height: auto !important;
+  min-width: 340px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(251, 191, 36, 0.02) 100%);
+  box-shadow: 
+    0 12px 48px rgba(251, 191, 36, 0.08),
+    0 24px 96px rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  z-index: 100; /* Bring to front when expanded */
+}
+
+/* Push other bubbles back when one is selected */
+.bubble.pushedBack {
+  z-index: 0;
+  opacity: 0.4;
+  filter: blur(1px);
+  transform: scale(0.95);
+}
+
+.bubble:hover:not(.expanded):not(.pushedBack) {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 8px 30px rgba(251, 191, 36, 0.06),
+    0 16px 60px rgba(0, 0, 0, 0.03);
+}
+
+/* Content */
+.initials {
+  font-size: 32px;
+  font-weight: 200;
+  color: #1d1d1f;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1d1d1f;
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 400;
+  color: #86868b;
+  letter-spacing: -0.01em;
+}
+
+.match {
+  margin-top: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 12px;
+  color: #F59E0B;
+  letter-spacing: 0.02em;
+  background: rgba(251, 191, 36, 0.08);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* Expanded content */
+.expandedContent {
+  display: none;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.bubble.expanded .expandedContent {
+  display: block;
+}
+
+.divider {
+  height: 0.5px;
+  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.1), transparent);
+  margin: 24px 0;
+}
+
+.metric {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.metricLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.metricBar {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.metricFill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+}
+
+/* Subtle breathing animation */
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.bubble:not(.expanded):not(.pushedBack) {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Close button for expanded bubble */
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.04);
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #86868b;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.bubble.expanded .closeBtn {
+  display: flex;
+}
+
+.closeBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1d1d1f;
 }
 
 /* Buttons */
@@ -307,156 +509,6 @@
   opacity: 0.3;
   pointer-events: none;
 }
-
-/* Bubbles */
-.bubblesContainer {
-  position: relative;
-  height: 400px;
-  max-width: 1200px;
-  margin: 0 auto 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bubble {
-  position: absolute;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 20px;
-  background: white;
-  border: 3px solid transparent;
-  animation: float 6s ease-in-out infinite;
-  overflow: hidden;
-}
-
-.bubble:hover {
-  transform: scale(1.1) translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  z-index: 10;
-}
-
-.bubble.selected {
-  border-color: #2196F3;
-  background: #e3f2fd;
-  animation: none;
-  transform: scale(1.15);
-  border-radius: 20px;
-  width: auto !important;
-  height: auto !important;
-  min-width: 240px;
-  padding: 24px;
-}
-
-.bubbleLarge {
-  width: 180px;
-  height: 180px;
-}
-
-.bubbleMedium {
-  width: 150px;
-  height: 150px;
-}
-
-.bubbleSmall {
-  width: 120px;
-  height: 120px;
-}
-
-.bubbleContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.bubbleAvatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  margin-bottom: 10px;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-}
-
-.bubbleName {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 4px;
-}
-
-.bubbleMatch {
-  font-size: 12px;
-  background: rgba(76, 175, 80, 0.1);
-  padding: 2px 8px;
-  border-radius: 12px;
-  color: #4CAF50;
-  font-weight: 500;
-}
-
-.bubbleMetrics {
-  display: none;
-  width: 100%;
-  margin-top: 16px;
-  gap: 8px;
-}
-
-.selected .bubbleMetrics {
-  display: flex;
-  flex-direction: column;
-}
-
-.metricItem {
-  margin-top: 8px;
-}
-
-.metricLabel {
-  font-size: 11px;
-  color: #999;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.metricBar {
-  width: 100%;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.metricFill {
-  height: 100%;
-  background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
-  border-radius: 3px;
-  transition: width 0.6s ease;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-20px) rotate(-5deg); }
-  75% { transform: translateY(20px) rotate(5deg); }
-}
-
-.bubble:nth-child(1) { animation-delay: 0s; }
-.bubble:nth-child(2) { animation-delay: 1s; }
-.bubble:nth-child(3) { animation-delay: 2s; }
-.bubble:nth-child(4) { animation-delay: 3s; }
-.bubble:nth-child(5) { animation-delay: 4s; }
 
 /* Testimonials */
 .testimonialsSection {
@@ -565,8 +617,10 @@
   .navLinks { display: none; }
   .hero h1 { font-size: 36px; }
   .testimonialCard { min-width: 300px; }
-  .bubblesContainer { height: 300px; }
-  .bubbleLarge { width: 140px; height: 140px; }
-  .bubbleMedium { width: 120px; height: 120px; }
-  .bubbleSmall { width: 100px; height: 100px; }
+  .container { height: 500px; }
+  .bubble[data-match="94"] { width: 140px; height: 140px; }
+  .bubble[data-match="91"] { width: 134px; height: 134px; }
+  .bubble[data-match="89"] { width: 130px; height: 130px; }
+  .bubble[data-match="87"] { width: 126px; height: 126px; }
+  .bubble[data-match="85"] { width: 123px; height: 123px; }
 }
