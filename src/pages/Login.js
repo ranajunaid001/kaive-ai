@@ -3,10 +3,12 @@ import styles from './Login.module.css';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.REACT_APP_SUPABASE_URL,
-  process.env.REACT_APP_SUPABASE_ANON_KEY
-);
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -16,9 +18,14 @@ function Login() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleGoogleLogin = async () => {
+    if (!supabase) {
+      alert('Supabase is not configured. Please check environment variables.');
+      return;
+    }
+
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/admin`
@@ -35,6 +42,12 @@ function Login() {
 
   const handleEmailAuth = async (e) => {
     e.preventDefault();
+    
+    if (!supabase) {
+      alert('Supabase is not configured. Please check environment variables.');
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -60,7 +73,7 @@ function Login() {
         }
       } else {
         // Sign In Mode
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: email,
           password: password,
         });
@@ -77,7 +90,8 @@ function Login() {
     }
   };
 
-  const toggleMode = () => {
+  const toggleMode = (e) => {
+    e.preventDefault();
     setIsSignUp(!isSignUp);
     setPassword('');
     setConfirmPassword('');
@@ -100,6 +114,7 @@ function Login() {
             className={styles.googleBtn} 
             onClick={handleGoogleLogin}
             disabled={loading}
+            type="button"
           >
             <svg className={styles.googleIcon} viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -171,9 +186,21 @@ function Login() {
           
           <div className={styles.signupLink}>
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); toggleMode(); }}>
+            <button 
+              onClick={toggleMode}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#1a1a1a',
+                fontWeight: '600',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+                padding: 0,
+                font: 'inherit'
+              }}
+            >
               {isSignUp ? 'Sign in' : 'Sign up'}
-            </a>
+            </button>
           </div>
         </div>
       </div>
