@@ -11,68 +11,68 @@ function HomePage({ onNavigate }) {
   const creators = [
     { 
       id: 1, 
+      initials: 'SC',
       name: 'Sarah Chen', 
       title: 'Product Designer', 
       tone: 'Minimalist, User-focused', 
-      emoji: '👩‍💻',
       match: 94,
-      avatar: 'https://res.cloudinary.com/dozrtbvmz/image/upload/v1752800602/Niharikka_y1octi.jpg',
-      color: '#FF6B6B',
-      size: 'large',
-      position: { left: '15%', top: '20%' },
-      metrics: { pulse: 92, aura: 95, auth: 96 }
+      metrics: { 
+        voice: 94,
+        authenticity: 96,
+        engagement: 92
+      }
     },
     { 
       id: 2, 
+      initials: 'AK',
       name: 'Alex Kumar', 
       title: 'Tech Founder', 
       tone: 'Visionary, Bold', 
-      emoji: '👨‍💼',
       match: 91,
-      avatar: '',
-      color: '#4ECDC4',
-      size: 'medium',
-      position: { left: '70%', top: '15%' },
-      metrics: { pulse: 90, aura: 92, auth: 91 }
+      metrics: { 
+        voice: 91,
+        authenticity: 91,
+        engagement: 90
+      }
     },
     { 
       id: 3, 
+      initials: 'MR',
       name: 'Maria Rodriguez', 
       title: 'Marketing Expert', 
       tone: 'Professional, Data-driven', 
-      emoji: '👩‍🏫',
       match: 89,
-      avatar: '',
-      color: '#45B7D1',
-      size: 'large',
-      position: { left: '50%', top: '40%' },
-      metrics: { pulse: 88, aura: 90, auth: 89 }
+      metrics: { 
+        voice: 89,
+        authenticity: 89,
+        engagement: 88
+      }
     },
     { 
       id: 4, 
+      initials: 'JP',
       name: 'James Park', 
       title: 'AI Researcher', 
       tone: 'Academic, Precise', 
-      emoji: '👨‍🔬',
       match: 87,
-      avatar: '',
-      color: '#96CEB4',
-      size: 'small',
-      position: { left: '25%', top: '60%' },
-      metrics: { pulse: 86, aura: 88, auth: 87 }
+      metrics: { 
+        voice: 87,
+        authenticity: 87,
+        engagement: 86
+      }
     },
     { 
       id: 5, 
+      initials: 'EW',
       name: 'Emma Wilson', 
       title: 'Startup Advisor', 
       tone: 'Strategic, Practical', 
-      emoji: '👩‍💼',
       match: 85,
-      avatar: '',
-      color: '#6C5CE7',
-      size: 'medium',
-      position: { left: '75%', top: '55%' },
-      metrics: { pulse: 84, aura: 87, auth: 83 }
+      metrics: { 
+        voice: 85,
+        authenticity: 83,
+        engagement: 84
+      }
     }
   ];
 
@@ -114,9 +114,19 @@ function HomePage({ onNavigate }) {
     }, 2500);
   };
 
-  const selectCreator = (creatorId) => {
-    const creator = creators.find(c => c.id === creatorId);
-    setSelectedCreator(creator);
+  const toggleBubble = (bubble) => {
+    if (selectedCreator?.id === bubble.id) {
+      setSelectedCreator(null);
+    } else {
+      setSelectedCreator(bubble);
+    }
+  };
+
+  const closeBubble = (event, creatorId) => {
+    event.stopPropagation();
+    if (selectedCreator?.id === creatorId) {
+      setSelectedCreator(null);
+    }
   };
 
   const generateContent = () => {
@@ -225,61 +235,57 @@ function HomePage({ onNavigate }) {
       {showResults && (
         <div className={`${styles.resultsSection} ${styles.show}`}>
           <div className={styles.resultsHeader}>
-            <h2>Perfect matches found!</h2>
-            <p style={{ fontSize: '18px', color: '#666' }}>Select a creator whose voice resonates with your content</p>
+            <h2>Select your voice</h2>
+            <p>Choose a creator whose style resonates with your content</p>
           </div>
           
-          <div className={styles.bubblesContainer}>
-            {creators.map(creator => {
-              const bubbleSizeClass = creator.size === 'large' ? styles.bubbleLarge : 
-                                      creator.size === 'medium' ? styles.bubbleMedium : 
-                                      styles.bubbleSmall;
-              
-              return (
-                <div 
-                  key={creator.id}
-                  className={`${styles.bubble} ${bubbleSizeClass} ${selectedCreator?.id === creator.id ? styles.selected : ''}`}
-                  style={{ left: creator.position.left, top: creator.position.top }}
-                  onClick={() => selectCreator(creator.id)}
+          <div className={styles.container}>
+            {creators.map((creator, index) => (
+              <div 
+                key={creator.id}
+                className={`${styles.bubble} ${selectedCreator?.id === creator.id ? styles.expanded : styles.circle} ${selectedCreator && selectedCreator.id !== creator.id ? styles.pushedBack : ''}`}
+                data-match={creator.match}
+                onClick={() => toggleBubble(creator)}
+                style={{
+                  animationDelay: `${index * 0.5}s`,
+                  left: `${[10, 70, 45, 20, 75][index]}%`,
+                  top: `${[20, 15, 40, 65, 60][index]}%`
+                }}
+              >
+                <button 
+                  className={styles.closeBtn} 
+                  onClick={(e) => closeBubble(e, creator.id)}
                 >
-                  <div className={styles.bubbleContent}>
-                    <div 
-                      className={styles.bubbleAvatar}
-                      style={creator.avatar ? 
-                        { backgroundImage: `url(${creator.avatar})` } : 
-                        { background: creator.color }
-                      }
-                    >
-                      {!creator.avatar && creator.emoji}
+                  ×
+                </button>
+                <div className={styles.initials}>{creator.initials}</div>
+                <div className={styles.name}>{creator.name}</div>
+                <div className={styles.title}>{creator.title}</div>
+                <div className={styles.match}>{creator.match}% match</div>
+                
+                <div className={styles.expandedContent}>
+                  <div className={styles.divider}></div>
+                  <div className={styles.metric}>
+                    <div className={styles.metricLabel}>Voice Match</div>
+                    <div className={styles.metricBar}>
+                      <div className={styles.metricFill} style={{ width: `${creator.metrics.voice}%` }}></div>
                     </div>
-                    <div className={styles.bubbleName}>{creator.name}</div>
-                    <div className={styles.bubbleMatch}>{creator.match}% match</div>
-                    {selectedCreator?.id === creator.id && (
-                      <div className={styles.bubbleMetrics}>
-                        <div className={styles.metricItem}>
-                          <div className={styles.metricLabel}>Match Pulse</div>
-                          <div className={styles.metricBar}>
-                            <div className={styles.metricFill} style={{ width: `${creator.metrics.pulse}%` }}></div>
-                          </div>
-                        </div>
-                        <div className={styles.metricItem}>
-                          <div className={styles.metricLabel}>Voice Aura</div>
-                          <div className={styles.metricBar}>
-                            <div className={styles.metricFill} style={{ width: `${creator.metrics.aura}%` }}></div>
-                          </div>
-                        </div>
-                        <div className={styles.metricItem}>
-                          <div className={styles.metricLabel}>Authenticity</div>
-                          <div className={styles.metricBar}>
-                            <div className={styles.metricFill} style={{ width: `${creator.metrics.auth}%` }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                  </div>
+                  <div className={styles.metric}>
+                    <div className={styles.metricLabel}>Authenticity</div>
+                    <div className={styles.metricBar}>
+                      <div className={styles.metricFill} style={{ width: `${creator.metrics.authenticity}%` }}></div>
+                    </div>
+                  </div>
+                  <div className={styles.metric}>
+                    <div className={styles.metricLabel}>Engagement</div>
+                    <div className={styles.metricBar}>
+                      <div className={styles.metricFill} style={{ width: `${creator.metrics.engagement}%` }}></div>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '80px' }}>
