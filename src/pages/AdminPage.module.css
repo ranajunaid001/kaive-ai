@@ -1,4 +1,4 @@
-/* AdminPage.module.css */
+/* AdminPage.module.css - COMPLETE FILE */
 
 .adminPage {
   min-height: 100vh;
@@ -263,10 +263,92 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
-.loadingMessage {
+.creatorCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.creatorAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #666, #333);
+}
+
+.creatorDetails {
+  flex: 1;
+}
+
+.creatorDetails h3 {
+  font-size: 1.125rem;
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+.creatorDetails p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.creatorStats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.creatorStat {
   text-align: center;
-  padding: 2rem;
-  color: rgba(255, 255, 255, 0.6);
+}
+
+.creatorStatValue {
+  font-size: 1.5rem;
+  font-weight: 200;
+  display: block;
+}
+
+.creatorStatLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.creatorActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.actionBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  font-size: 0.813rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.actionBtn.delete {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.actionBtn.delete:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.5);
 }
 
 /* Responsive */
