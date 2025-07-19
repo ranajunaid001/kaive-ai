@@ -1,234 +1,345 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function HomePage({ onNavigate }) {
-  const [showCreatorList, setShowCreatorList] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState(null);
-  const [writingText, setWritingText] = useState('');
-  const [showWritingFirst, setShowWritingFirst] = useState(false);
-  const [carouselIndex, setCarouselIndex] = useState(2);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [showResults, setShowResults] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   const creators = [
-    { id: 1, name: 'Sarah Chen', title: 'Product Designer', tone: 'Minimalist, User-focused, Technical', emoji: '👩‍💻' },
-    { id: 2, name: 'Alex Kumar', title: 'Tech Founder', tone: 'Visionary, Bold, Inspirational', emoji: '👨‍💼' },
-    { id: 3, name: 'Maria Rodriguez', title: 'Marketing Expert', tone: 'Professional, Engaging, Data-driven', emoji: '👩‍🏫' },
-    { id: 4, name: 'James Park', title: 'AI Researcher', tone: 'Academic, Precise, Forward-thinking', emoji: '👨‍🔬' },
-    { id: 5, name: 'Emma Wilson', title: 'Startup Advisor', tone: 'Strategic, Practical, Growth-oriented', emoji: '👩‍💼' },
+    { 
+      id: 1, 
+      name: 'Sarah Chen', 
+      title: 'Product Designer', 
+      tone: 'Minimalist, User-focused', 
+      emoji: '👩‍💻',
+      match: 94,
+      avatar: 'https://res.cloudinary.com/dozrtbvmz/image/upload/v1752800602/Niharikka_y1octi.jpg',
+      color: '#FF6B6B',
+      size: 'large',
+      position: { left: '15%', top: '20%' },
+      metrics: { pulse: 92, aura: 95, auth: 96 }
+    },
+    { 
+      id: 2, 
+      name: 'Alex Kumar', 
+      title: 'Tech Founder', 
+      tone: 'Visionary, Bold', 
+      emoji: '👨‍💼',
+      match: 91,
+      avatar: '',
+      color: '#4ECDC4',
+      size: 'medium',
+      position: { left: '70%', top: '15%' },
+      metrics: { pulse: 90, aura: 92, auth: 91 }
+    },
+    { 
+      id: 3, 
+      name: 'Maria Rodriguez', 
+      title: 'Marketing Expert', 
+      tone: 'Professional, Data-driven', 
+      emoji: '👩‍🏫',
+      match: 89,
+      avatar: '',
+      color: '#45B7D1',
+      size: 'large',
+      position: { left: '50%', top: '40%' },
+      metrics: { pulse: 88, aura: 90, auth: 89 }
+    },
+    { 
+      id: 4, 
+      name: 'James Park', 
+      title: 'AI Researcher', 
+      tone: 'Academic, Precise', 
+      emoji: '👨‍🔬',
+      match: 87,
+      avatar: '',
+      color: '#96CEB4',
+      size: 'small',
+      position: { left: '25%', top: '60%' },
+      metrics: { pulse: 86, aura: 88, auth: 87 }
+    },
+    { 
+      id: 5, 
+      name: 'Emma Wilson', 
+      title: 'Startup Advisor', 
+      tone: 'Strategic, Practical', 
+      emoji: '👩‍💼',
+      match: 85,
+      avatar: '',
+      color: '#6C5CE7',
+      size: 'medium',
+      position: { left: '75%', top: '55%' },
+      metrics: { pulse: 84, aura: 87, auth: 83 }
+    }
   ];
 
-  const handleCreatorClick = (index) => {
-    setCarouselIndex(index);
-    setSelectedCreator(creators[index]);
+  const testimonials = [
+    { text: "Kaive has transformed my LinkedIn game. I write 10x faster while maintaining my authentic voice. Absolutely incredible!", author: "Maria Martin", role: "@maria_martin", social: "twitter" },
+    { text: "Just built this awesome content strategy using Kaive! The AI understands context like no other tool I've used.", author: "Gleb Konon", role: "Product Designer", social: "linkedin" },
+    { text: "What makes Kaive different is that it actually captures my writing style. It's like having a personal writing assistant.", author: "Richard Manisa", role: "Content Creator", social: "linkedin" },
+    { text: "Finally, an AI tool that gets LinkedIn's unique style. My engagement has tripled since using Kaive!", author: "Sarah Chen", role: "Marketing Director", social: "linkedin" },
+    { text: "The fastest content creation moment I have ever had. From idea to polished post in under 2 minutes!", author: "Erel Cohen", role: "Entrepreneur", social: "twitter" },
+    { text: "Kaive revolutionizes content creation by matching your voice with proven creator styles. Game changer!", author: "Eran Cohen", role: "Growth Expert", social: "linkedin" },
+    { text: "Amazing understanding of context and nuance. It's like the AI actually gets what I'm trying to say.", author: "Ariel Mills", role: "Writer", social: "medium" },
+    { text: "I've tried every AI writing tool out there. Kaive is the only one that truly understands LinkedIn's voice.", author: "Alex Thompson", role: "CEO & Founder", social: "twitter" }
+  ];
+
+  const suggestionPrompts = {
+    'Little Win': "Today I closed my first client after 47 cold emails. It's not a million dollar deal, but it's proof that persistence pays off.",
+    'Personal Growth': "I used to avoid difficult conversations at all costs. This week I learned that having them early saves everyone time and stress.",
+    'Failure': "My product launch flopped with zero sales on day one. Here's what I learned about market validation the hard way.",
+    'Learning': "I spent $10K on Facebook ads with terrible results. But the data taught me something valuable about my target audience.",
+    'AI Tool': "I just discovered an AI tool that saved me 10 hours this week. Here's how I'm using it to automate my content research process."
   };
 
-  const handleGenerate = () => {
-    setIsGenerating(true);
+  useEffect(() => {
+    const words = userInput.trim().split(/\s+/).filter(w => w.length > 0).length;
+    setWordCount(words);
+  }, [userInput]);
+
+  const fillSuggestion = (key) => {
+    setUserInput(suggestionPrompts[key]);
+  };
+
+  const analyzeContent = () => {
+    if (wordCount < 20) return;
+    
+    setIsAnalyzing(true);
     setTimeout(() => {
-      setIsGenerating(false);
-      alert(`Generated content in ${selectedCreator.name}'s voice!`);
-    }, 2000);
+      setIsAnalyzing(false);
+      setShowResults(true);
+    }, 2500);
+  };
+
+  const selectCreator = (creatorId) => {
+    const creator = creators.find(c => c.id === creatorId);
+    setSelectedCreator(creator);
+  };
+
+  const generateContent = () => {
+    if (!selectedCreator) return;
+    alert(`✨ Content generated in ${selectedCreator.name}'s voice!`);
+  };
+
+  const socialIcons = {
+    twitter: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    ),
+    linkedin: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+    ),
+    medium: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
+        <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>
+      </svg>
+    )
   };
 
   return (
     <div className="home-page">
       {/* Navigation */}
-      <nav className="nav">
-        <div className="nav-content">
-          <h1 className="logo">Kaive AI</h1>
-          <button className="nav-button" onClick={() => onNavigate('admin')}>
-            Admin
-          </button>
-        </div>
-      </nav>
-
-      {/* Header */}
-      <header className="header">
-        <h2>Write in any creator's voice</h2>
-        <p>Powered by AI</p>
-      </header>
-      
-      {/* Find Creators Button */}
-      <div className="find-creators-container">
-        <button className="find-creators-btn" onClick={() => setShowCreatorList(true)}>
-          🔍 Find Creators
-        </button>
-        
-        {/* Creator Pills */}
-        <div className="creator-pills">
-          <div className="avatar-group">
-            <span className="avatar">👤</span>
-            <span className="avatar">👤</span>
-            <span className="avatar">👤</span>
+      <nav className="nav glass">
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <a href="/" className="logo">
+            <div className="logo-icon">K</div>
+            <span>Kaive</span>
+          </a>
+          <div className="nav-links">
+            <a href="#">Pricing</a>
+            <a href="#">Enterprise</a>
           </div>
-          <span className="creator-count">Join 350+ creators</span>
         </div>
-      </div>
-
-      {/* Carousel */}
-      <div className="carousel-section">
-        <div className="carousel-track">
-          {creators.map((creator, index) => (
-            <div
-              key={creator.id}
-              className={`creator-card ${index === carouselIndex ? 'active' : ''}`}
-              onClick={() => handleCreatorClick(index)}
+        <button className="nav-button" onClick={() => onNavigate('admin')}>
+          Admin
+        </button>
+      </nav>
+      
+      {/* Hero Section */}
+      <section className="hero">
+        <h1>Let's make your content a <span className="highlight">reality.</span><br />Today.</h1>
+        <p>Kaive lets you write authentic LinkedIn posts in minutes with your favorite creator's voice. No prompting necessary.</p>
+      </section>
+      
+      {/* Input Card */}
+      {!showResults && !isAnalyzing && (
+        <>
+          <div className="input-card" id="inputCard">
+            <textarea 
+              className="input-area" 
+              id="userInput"
+              placeholder="What do you want to write about?"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              autoFocus
+            />
+            <button 
+              className={`send-btn ${wordCount >= 20 ? 'active' : ''}`} 
+              onClick={analyzeContent}
+              disabled={wordCount < 20}
             >
-              <div className="creator-thumbnail">
-                <div className="play-icon">
-                  <span className="play-arrow">▶</span>
-                </div>
-              </div>
-              <div className="creator-info">
-                <div className="creator-name">{creator.name}</div>
-                <div className="creator-title">{creator.title}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Navigation Dots */}
-      <div className="nav-dots">
-        {creators.map((_, index) => (
-          <button
-            key={index}
-            className={`dot ${index === carouselIndex ? 'active' : ''}`}
-            onClick={() => setCarouselIndex(index)}
-          />
-        ))}
-      </div>
-
-      {/* Creator Selection Modal */}
-      {showCreatorList && (
-        <div className="modal">
-          <div className="modal-content">
-            <button className="close-btn" onClick={() => setShowCreatorList(false)}>×</button>
-            <h2>Choose Your Path</h2>
-            <p>Select a creator first or write and let AI suggest</p>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M7 11L12 6L17 11M12 6V18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
             
-            <div className="options-grid">
-              {/* Option 1: Choose Creator */}
-              <div className="option">
-                <h3>🎯 Choose Creator First</h3>
-                <p>Browse creators and write in their unique voice</p>
-                <div className="creator-list">
-                  {creators.map((creator) => (
-                    <button
-                      key={creator.id}
-                      className="creator-option"
-                      onClick={() => {
-                        setSelectedCreator(creator);
-                        setShowCreatorList(false);
-                      }}
-                    >
-                      <span className="creator-emoji">{creator.emoji}</span>
-                      <div className="creator-option-info">
-                        <div className="creator-option-name">{creator.name}</div>
-                        <div className="creator-option-title">{creator.title}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Option 2: Write First */}
-              <div className="option">
-                <h3>✍️ Write First</h3>
-                <p>Start writing and AI will suggest the best creator voice</p>
-                <button
-                  className="write-first-btn"
-                  onClick={() => {
-                    setShowWritingFirst(true);
-                    setShowCreatorList(false);
-                  }}
-                >
-                  Start Writing →
-                </button>
-                <div className="ai-features">
-                  <div className="ai-feature">✨ AI analyzes your content</div>
-                  <div className="ai-feature">🎯 Matches writing style</div>
-                  <div className="ai-feature">💡 Suggests best creator</div>
-                </div>
+            <div className="suggestions">
+              <div className="suggestions-label">Not sure where to start? Try one of these:</div>
+              <div className="suggestion-pills">
+                <div className="pill" onClick={() => fillSuggestion('Little Win')}>Little Win</div>
+                <div className="pill" onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
+                <div className="pill" onClick={() => fillSuggestion('Failure')}>Failure</div>
+                <div className="pill" onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
+                <div className="pill" onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
               </div>
             </div>
+          </div>
+          
+          {/* Trust Section */}
+          <div className="trust-section">
+            <div className="trust-avatars">
+              <div className="avatar" style={{ background: '#2196F3' }}>JW</div>
+              <div className="avatar" style={{ background: '#FF6B35' }}>SB</div>
+              <div className="avatar" style={{ background: '#2196F3' }}>DB</div>
+            </div>
+            <span style={{ fontSize: '14px', color: 'var(--dark)', opacity: 0.7 }}>Trusted by 50K+ writers</span>
+          </div>
+        </>
+      )}
+      
+      {/* Loading State */}
+      {isAnalyzing && (
+        <div className="loading show">
+          <div className="spinner"></div>
+          <h3 style={{ fontSize: '24px', color: 'var(--dark)', marginBottom: '8px' }}>Analyzing your writing style</h3>
+          <p style={{ color: 'var(--gray)' }}>Finding the perfect creator match...</p>
+        </div>
+      )}
+      
+      {/* Results Section */}
+      {showResults && (
+        <div className="results-section show">
+          <div className="results-header">
+            <h2>Perfect matches found!</h2>
+            <p style={{ fontSize: '18px', color: 'var(--gray)' }}>Select a creator whose voice resonates with your content</p>
+          </div>
+          
+          <div className="bubbles-container">
+            {creators.map(creator => (
+              <div 
+                key={creator.id}
+                className={`bubble bubble-${creator.size} ${selectedCreator?.id === creator.id ? 'selected' : ''}`} 
+                style={{ left: creator.position.left, top: creator.position.top }}
+                onClick={() => selectCreator(creator.id)}
+              >
+                <div className="bubble-content">
+                  <div 
+                    className="bubble-avatar" 
+                    style={creator.avatar ? 
+                      { backgroundImage: `url(${creator.avatar})` } : 
+                      { background: creator.color }
+                    }
+                  >
+                    {!creator.avatar && creator.emoji}
+                  </div>
+                  <div className="bubble-name">{creator.name}</div>
+                  <div className="bubble-match">{creator.match}% match</div>
+                  {selectedCreator?.id === creator.id && (
+                    <div className="bubble-metrics">
+                      <div className="metric-item">
+                        <div className="metric-label">Match Pulse</div>
+                        <div className="metric-bar">
+                          <div className="metric-fill" style={{ width: `${creator.metrics.pulse}%` }}></div>
+                        </div>
+                      </div>
+                      <div className="metric-item">
+                        <div className="metric-label">Voice Aura</div>
+                        <div className="metric-bar">
+                          <div className="metric-fill" style={{ width: `${creator.metrics.aura}%` }}></div>
+                        </div>
+                      </div>
+                      <div className="metric-item">
+                        <div className="metric-label">Authenticity</div>
+                        <div className="metric-bar">
+                          <div className="metric-fill" style={{ width: `${creator.metrics.auth}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+            <button 
+              className="btn btn-dark" 
+              disabled={!selectedCreator}
+              onClick={generateContent}
+            >
+              {selectedCreator ? `Generate as ${selectedCreator.name}` : 'Select a creator to continue'}
+            </button>
           </div>
         </div>
       )}
-
-      {/* Writing Panel */}
-      <div className={`writing-panel ${selectedCreator || showWritingFirst ? 'active' : ''}`}>
-        {selectedCreator ? (
-          <>
-            <div className="writing-panel-header">
-              <div className="writing-creator-info">
-                <div className="creator-avatar">{selectedCreator.emoji}</div>
-                <div>
-                  <h3>{selectedCreator.name}</h3>
-                  <p>Writing in {selectedCreator.name}'s voice</p>
+      
+      {/* Testimonials Section */}
+      <section className="testimonials-section">
+        <div className="testimonials-container">
+          {/* Row 1 - Scrolling Left */}
+          <div className="testimonial-row row-1">
+            {[...testimonials.slice(0, 4), ...testimonials.slice(0, 4)].map((t, i) => (
+              <div key={i} className="testimonial-card">
+                <p className="testimonial-content">{t.text}</p>
+                <div className="testimonial-author">
+                  <div className="author-info">
+                    <div 
+                      className="author-avatar" 
+                      style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 1})` }}
+                    ></div>
+                    <div className="author-details">
+                      <h4>{t.author}</h4>
+                      <p>{t.role}</p>
+                    </div>
+                  </div>
+                  <div className="social-icon">
+                    {socialIcons[t.social]}
+                  </div>
                 </div>
               </div>
-              <button className="close-btn" onClick={() => {
-                setSelectedCreator(null);
-                setWritingText('');
-              }}>×</button>
-            </div>
-            
-            <textarea
-              className="writing-textarea"
-              placeholder={`What would you like ${selectedCreator.name} to write about?`}
-              value={writingText}
-              onChange={(e) => setWritingText(e.target.value)}
-              autoFocus
-            />
-            
-            <div className="writing-footer">
-              <span className="tone-indicator">Tone: {selectedCreator.tone}</span>
-              <button 
-                className="generate-btn" 
-                onClick={handleGenerate}
-                disabled={!writingText || isGenerating}
-              >
-                {isGenerating ? (
-                  <>
-                    <span className="loading-spinner">⟳</span> Generating...
-                  </>
-                ) : (
-                  'Generate'
-                )}
-              </button>
-            </div>
-          </>
-        ) : showWritingFirst ? (
-          <>
-            <div className="writing-panel-header">
-              <div>
-                <h3>Start Writing</h3>
-                <p>Write your content and AI will suggest the best creator voice</p>
+            ))}
+          </div>
+          
+          {/* Row 2 - Scrolling Right */}
+          <div className="testimonial-row row-2">
+            {[...testimonials.slice(4, 8), ...testimonials.slice(4, 8)].map((t, i) => (
+              <div key={i} className="testimonial-card">
+                <p className="testimonial-content">{t.text}</p>
+                <div className="testimonial-author">
+                  <div className="author-info">
+                    <div 
+                      className="author-avatar" 
+                      style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 5})` }}
+                    ></div>
+                    <div className="author-details">
+                      <h4>{t.author}</h4>
+                      <p>{t.role}</p>
+                    </div>
+                  </div>
+                  <div className="social-icon">
+                    {socialIcons[t.social]}
+                  </div>
+                </div>
               </div>
-              <button className="close-btn" onClick={() => {
-                setShowWritingFirst(false);
-                setWritingText('');
-              }}>×</button>
-            </div>
-            
-            <textarea
-              className="writing-textarea"
-              placeholder="What would you like to write about?"
-              value={writingText}
-              onChange={(e) => setWritingText(e.target.value)}
-              autoFocus
-            />
-            
-            {writingText.length > 50 && (
-              <div className="ai-suggestion-area">
-                <button className="analyze-btn">
-                  🤖 Analyze & Suggest Best Voice
-                </button>
-              </div>
-            )}
-          </>
-        ) : null}
-      </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
