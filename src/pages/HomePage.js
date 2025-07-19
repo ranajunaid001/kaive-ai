@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './HomePage.module.css';
 
 function HomePage({ onNavigate }) {
+  const navigate = useNavigate();
   const [selectedCreator, setSelectedCreator] = useState(null);
   const [userInput, setUserInput] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -11,10 +13,10 @@ function HomePage({ onNavigate }) {
   const creators = [
     { 
       id: 1, 
-      initials: 'SC',
-      name: 'Sarah Chen', 
-      title: 'Product Designer', 
-      tone: 'Minimalist, User-focused', 
+      initials: 'SS',
+      name: 'Simon Sinek', 
+      title: 'Leadership Expert', 
+      tone: 'Inspirational, Purpose-driven', 
       match: 94,
       metrics: { 
         voice: 94,
@@ -24,10 +26,10 @@ function HomePage({ onNavigate }) {
     },
     { 
       id: 2, 
-      initials: 'AK',
-      name: 'Alex Kumar', 
-      title: 'Tech Founder', 
-      tone: 'Visionary, Bold', 
+      initials: 'GV',
+      name: 'Gary Vaynerchuk', 
+      title: 'CEO & Entrepreneur', 
+      tone: 'Direct, Motivational', 
       match: 91,
       metrics: { 
         voice: 91,
@@ -37,10 +39,10 @@ function HomePage({ onNavigate }) {
     },
     { 
       id: 3, 
-      initials: 'MR',
-      name: 'Maria Rodriguez', 
-      title: 'Marketing Expert', 
-      tone: 'Professional, Data-driven', 
+      initials: 'JW',
+      name: 'Justin Welsh', 
+      title: 'Solopreneur', 
+      tone: 'Tactical, Growth-focused', 
       match: 89,
       metrics: { 
         voice: 89,
@@ -50,10 +52,10 @@ function HomePage({ onNavigate }) {
     },
     { 
       id: 4, 
-      initials: 'JP',
-      name: 'James Park', 
-      title: 'AI Researcher', 
-      tone: 'Academic, Precise', 
+      initials: 'BM',
+      name: 'Ben Meer', 
+      title: 'Systems Thinker', 
+      tone: 'Analytical, Strategic', 
       match: 87,
       metrics: { 
         voice: 87,
@@ -63,15 +65,41 @@ function HomePage({ onNavigate }) {
     },
     { 
       id: 5, 
-      initials: 'EW',
-      name: 'Emma Wilson', 
-      title: 'Startup Advisor', 
-      tone: 'Strategic, Practical', 
+      initials: 'SB',
+      name: 'Steve Bartlett', 
+      title: 'Podcast Host & CEO', 
+      tone: 'Vulnerable, Authentic', 
       match: 85,
       metrics: { 
         voice: 85,
         authenticity: 83,
         engagement: 84
+      }
+    },
+    { 
+      id: 6, 
+      initials: 'JA',
+      name: 'Jasmin Alic', 
+      title: 'Brand Strategist', 
+      tone: 'Creative, Strategic', 
+      match: 83,
+      metrics: { 
+        voice: 83,
+        authenticity: 82,
+        engagement: 83
+      }
+    },
+    { 
+      id: 7, 
+      initials: 'RP',
+      name: 'Reno Perry', 
+      title: 'Content Creator', 
+      tone: 'Engaging, Conversational', 
+      match: 81,
+      metrics: { 
+        voice: 81,
+        authenticity: 80,
+        engagement: 81
       }
     }
   ];
@@ -99,6 +127,12 @@ function HomePage({ onNavigate }) {
     const words = userInput.trim().split(/\s+/).filter(w => w.length > 0).length;
     setWordCount(words);
   }, [userInput]);
+
+  const checkAuth = () => {
+    // Check if user is authenticated
+    const isAuthenticated = localStorage.getItem('kaive_auth_token');
+    return isAuthenticated;
+  };
 
   const fillSuggestion = (key) => {
     setUserInput(suggestionPrompts[key]);
@@ -131,7 +165,19 @@ function HomePage({ onNavigate }) {
 
   const generateContent = () => {
     if (!selectedCreator) return;
-    alert(`✨ Content generated in ${selectedCreator.name}'s voice!`);
+    
+    // Store the selected creator and user input for the app page
+    sessionStorage.setItem('selectedCreator', JSON.stringify(selectedCreator));
+    sessionStorage.setItem('userInput', userInput);
+    
+    // Check authentication
+    if (checkAuth()) {
+      // User is logged in, go to app page
+      window.location.href = 'https://app.kaive.xyz';
+    } else {
+      // User is not logged in, go to login page
+      navigate('/login');
+    }
   };
 
   const socialIcons = {
@@ -247,9 +293,10 @@ function HomePage({ onNavigate }) {
                 data-match={creator.match}
                 onClick={() => toggleBubble(creator)}
                 style={{
-                  animationDelay: `${index * 0.5}s`,
-                  left: `${[10, 70, 45, 20, 75][index]}%`,
-                  top: `${[20, 15, 40, 65, 60][index]}%`
+                  animationDelay: `${index * 0.3}s`,
+                  // World map-like distribution
+                  left: `${[25, 70, 10, 50, 85, 35, 65][index]}%`,
+                  top: `${[20, 15, 45, 40, 55, 70, 75][index]}%`
                 }}
               >
                 <button 
@@ -283,19 +330,16 @@ function HomePage({ onNavigate }) {
                       <div className={styles.metricFill} style={{ width: `${creator.metrics.engagement}%` }}></div>
                     </div>
                   </div>
+                  
+                  <button 
+                    className={styles.generateBtn}
+                    onClick={generateContent}
+                  >
+                    Generate Post
+                  </button>
                 </div>
               </div>
             ))}
-          </div>
-          
-          <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-            <button 
-              className={`${styles.btn} ${styles.btnDark}`}
-              disabled={!selectedCreator}
-              onClick={generateContent}
-            >
-              {selectedCreator ? `Generate as ${selectedCreator.name}` : 'Select a creator to continue'}
-            </button>
           </div>
         </div>
       )}
