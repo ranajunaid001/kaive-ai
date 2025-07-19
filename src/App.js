@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
-import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
