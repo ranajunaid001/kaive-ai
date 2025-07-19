@@ -149,4 +149,8 @@
   background: white;
 }
 
-.forg
+.forgotPassword {
+  text-align: right;
+  margin-top: -12px;
+  margin-bottom: 24px;
+}
