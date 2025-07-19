@@ -1,347 +1,569 @@
-import React, { useState, useEffect } from 'react';
+/* Add these styles to your App.css for the Homepage */
 
-function HomePage({ onNavigate }) {
-  const [selectedCreator, setSelectedCreator] = useState(null);
-  const [userInput, setUserInput] = useState('');
-  const [showResults, setShowResults] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-
-  const creators = [
-    { 
-      id: 1, 
-      name: 'Sarah Chen', 
-      title: 'Product Designer', 
-      tone: 'Minimalist, User-focused', 
-      emoji: '👩‍💻',
-      match: 94,
-      avatar: 'https://res.cloudinary.com/dozrtbvmz/image/upload/v1752800602/Niharikka_y1octi.jpg',
-      color: '#FF6B6B',
-      size: 'large',
-      position: { left: '15%', top: '20%' },
-      metrics: { pulse: 92, aura: 95, auth: 96 }
-    },
-    { 
-      id: 2, 
-      name: 'Alex Kumar', 
-      title: 'Tech Founder', 
-      tone: 'Visionary, Bold', 
-      emoji: '👨‍💼',
-      match: 91,
-      avatar: '',
-      color: '#4ECDC4',
-      size: 'medium',
-      position: { left: '70%', top: '15%' },
-      metrics: { pulse: 90, aura: 92, auth: 91 }
-    },
-    { 
-      id: 3, 
-      name: 'Maria Rodriguez', 
-      title: 'Marketing Expert', 
-      tone: 'Professional, Data-driven', 
-      emoji: '👩‍🏫',
-      match: 89,
-      avatar: '',
-      color: '#45B7D1',
-      size: 'large',
-      position: { left: '50%', top: '40%' },
-      metrics: { pulse: 88, aura: 90, auth: 89 }
-    },
-    { 
-      id: 4, 
-      name: 'James Park', 
-      title: 'AI Researcher', 
-      tone: 'Academic, Precise', 
-      emoji: '👨‍🔬',
-      match: 87,
-      avatar: '',
-      color: '#96CEB4',
-      size: 'small',
-      position: { left: '25%', top: '60%' },
-      metrics: { pulse: 86, aura: 88, auth: 87 }
-    },
-    { 
-      id: 5, 
-      name: 'Emma Wilson', 
-      title: 'Startup Advisor', 
-      tone: 'Strategic, Practical', 
-      emoji: '👩‍💼',
-      match: 85,
-      avatar: '',
-      color: '#6C5CE7',
-      size: 'medium',
-      position: { left: '75%', top: '55%' },
-      metrics: { pulse: 84, aura: 87, auth: 83 }
-    }
-  ];
-
-  const testimonials = [
-    { text: "Kaive has transformed my LinkedIn game. I write 10x faster while maintaining my authentic voice. Absolutely incredible!", author: "Maria Martin", role: "@maria_martin", social: "twitter" },
-    { text: "Just built this awesome content strategy using Kaive! The AI understands context like no other tool I've used.", author: "Gleb Konon", role: "Product Designer", social: "linkedin" },
-    { text: "What makes Kaive different is that it actually captures my writing style. It's like having a personal writing assistant.", author: "Richard Manisa", role: "Content Creator", social: "linkedin" },
-    { text: "Finally, an AI tool that gets LinkedIn's unique style. My engagement has tripled since using Kaive!", author: "Sarah Chen", role: "Marketing Director", social: "linkedin" },
-    { text: "The fastest content creation moment I have ever had. From idea to polished post in under 2 minutes!", author: "Erel Cohen", role: "Entrepreneur", social: "twitter" },
-    { text: "Kaive revolutionizes content creation by matching your voice with proven creator styles. Game changer!", author: "Eran Cohen", role: "Growth Expert", social: "linkedin" },
-    { text: "Amazing understanding of context and nuance. It's like the AI actually gets what I'm trying to say.", author: "Ariel Mills", role: "Writer", social: "medium" },
-    { text: "I've tried every AI writing tool out there. Kaive is the only one that truly understands LinkedIn's voice.", author: "Alex Thompson", role: "CEO & Founder", social: "twitter" }
-  ];
-
-  const suggestionPrompts = {
-    'Little Win': "Today I closed my first client after 47 cold emails. It's not a million dollar deal, but it's proof that persistence pays off.",
-    'Personal Growth': "I used to avoid difficult conversations at all costs. This week I learned that having them early saves everyone time and stress.",
-    'Failure': "My product launch flopped with zero sales on day one. Here's what I learned about market validation the hard way.",
-    'Learning': "I spent $10K on Facebook ads with terrible results. But the data taught me something valuable about my target audience.",
-    'AI Tool': "I just discovered an AI tool that saved me 10 hours this week. Here's how I'm using it to automate my content research process."
-  };
-
-  useEffect(() => {
-    const words = userInput.trim().split(/\s+/).filter(w => w.length > 0).length;
-    setWordCount(words);
-  }, [userInput]);
-
-  const fillSuggestion = (key) => {
-    setUserInput(suggestionPrompts[key]);
-  };
-
-  const analyzeContent = () => {
-    if (wordCount < 20) return;
-    
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setShowResults(true);
-    }, 2500);
-  };
-
-  const selectCreator = (creatorId) => {
-    const creator = creators.find(c => c.id === creatorId);
-    setSelectedCreator(creator);
-  };
-
-  const generateContent = () => {
-    if (!selectedCreator) return;
-    alert(`✨ Content generated in ${selectedCreator.name}'s voice!`);
-  };
-
-  const socialIcons = {
-    twitter: (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-      </svg>
-    ),
-    linkedin: (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-      </svg>
-    ),
-    medium: (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" opacity="0.6">
-        <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>
-      </svg>
-    )
-  };
-
-  return (
-    <div className="home-page">
-      {/* Navigation */}
-      <nav className="nav glass">
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <a href="/" className="logo">
-            <div className="logo-icon">K</div>
-            <span>Kaive</span>
-          </a>
-          <div className="nav-links">
-            <a href="#">Pricing</a>
-            <a href="#">Enterprise</a>
-          </div>
-        </div>
-        <button className="nav-button" onClick={() => onNavigate('admin')}>
-          Admin
-        </button>
-      </nav>
-      
-      {/* Hero Section */}
-      <section className="hero">
-        <h1>Let's make your content a <span className="highlight">reality.</span><br />Today.</h1>
-        <p>Kaive lets you write authentic LinkedIn posts in minutes with your favorite creator's voice. No prompting necessary.</p>
-      </section>
-      
-      {/* Input Card */}
-      {!showResults && !isAnalyzing && (
-        <>
-          <div className="input-card" id="inputCard">
-            <textarea 
-              className="input-area" 
-              id="userInput"
-              placeholder="What do you want to write about?"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              autoFocus
-            />
-            <button 
-              className={`send-btn ${wordCount >= 20 ? 'active' : ''}`} 
-              onClick={analyzeContent}
-              disabled={wordCount < 20}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M7 11L12 6L17 11M12 6V18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-            
-            <div className="suggestions">
-              <div className="suggestions-label">Not sure where to start? Try one of these:</div>
-              <div className="suggestion-pills">
-                <div className="pill" onClick={() => fillSuggestion('Little Win')}>Little Win</div>
-                <div className="pill" onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
-                <div className="pill" onClick={() => fillSuggestion('Failure')}>Failure</div>
-                <div className="pill" onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
-                <div className="pill" onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Trust Section */}
-          <div className="trust-section">
-            <div className="trust-avatars">
-              <div className="avatar" style={{ background: '#2196F3' }}>JW</div>
-              <div className="avatar" style={{ background: '#FF6B35' }}>SB</div>
-              <div className="avatar" style={{ background: '#2196F3' }}>DB</div>
-            </div>
-            <span style={{ fontSize: '14px', color: 'var(--dark)', opacity: 0.7 }}>Trusted by 50K+ writers</span>
-          </div>
-        </>
-      )}
-      
-      {/* Loading State */}
-      {isAnalyzing && (
-        <div className="loading show">
-          <div className="spinner"></div>
-          <h3 style={{ fontSize: '24px', color: 'var(--dark)', marginBottom: '8px' }}>Analyzing your writing style</h3>
-          <p style={{ color: 'var(--gray)' }}>Finding the perfect creator match...</p>
-        </div>
-      )}
-      
-      {/* Results Section */}
-      {showResults && (
-        <div className="results-section show">
-          <div className="results-header">
-            <h2>Perfect matches found!</h2>
-            <p style={{ fontSize: '18px', color: 'var(--gray)' }}>Select a creator whose voice resonates with your content</p>
-          </div>
-          
-          <div className="bubbles-container">
-            {creators.map(creator => (
-              <div 
-                key={creator.id}
-                className={`bubble bubble-${creator.size} ${selectedCreator?.id === creator.id ? 'selected' : ''}`} 
-                style={{ left: creator.position.left, top: creator.position.top }}
-                onClick={() => selectCreator(creator.id)}
-              >
-                <div className="bubble-content">
-                  <div 
-                    className="bubble-avatar" 
-                    style={creator.avatar ? 
-                      { backgroundImage: `url(${creator.avatar})` } : 
-                      { background: creator.color }
-                    }
-                  >
-                    {!creator.avatar && creator.emoji}
-                  </div>
-                  <div className="bubble-name">{creator.name}</div>
-                  <div className="bubble-match">{creator.match}% match</div>
-                  {selectedCreator?.id === creator.id && (
-                    <div className="bubble-metrics">
-                      <div className="metric-item">
-                        <div className="metric-label">Match Pulse</div>
-                        <div className="metric-bar">
-                          <div className="metric-fill" style={{ width: `${creator.metrics.pulse}%` }}></div>
-                        </div>
-                      </div>
-                      <div className="metric-item">
-                        <div className="metric-label">Voice Aura</div>
-                        <div className="metric-bar">
-                          <div className="metric-fill" style={{ width: `${creator.metrics.aura}%` }}></div>
-                        </div>
-                      </div>
-                      <div className="metric-item">
-                        <div className="metric-label">Authenticity</div>
-                        <div className="metric-bar">
-                          <div className="metric-fill" style={{ width: `${creator.metrics.auth}%` }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-            <button 
-              className="btn btn-dark" 
-              disabled={!selectedCreator}
-              onClick={generateContent}
-            >
-              {selectedCreator ? `Generate as ${selectedCreator.name}` : 'Select a creator to continue'}
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <div className="testimonials-container">
-          {/* Row 1 - Scrolling Left */}
-          <div className="testimonial-row row-1">
-            {[...testimonials.slice(0, 4), ...testimonials.slice(0, 4)].map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <p className="testimonial-content">{t.text}</p>
-                <div className="testimonial-author">
-                  <div className="author-info">
-                    <div 
-                      className="author-avatar" 
-                      style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 1})` }}
-                    ></div>
-                    <div className="author-details">
-                      <h4>{t.author}</h4>
-                      <p>{t.role}</p>
-                    </div>
-                  </div>
-                  <div className="social-icon">
-                    {socialIcons[t.social]}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Row 2 - Scrolling Right */}
-          <div className="testimonial-row row-2">
-            {[...testimonials.slice(4, 8), ...testimonials.slice(4, 8)].map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <p className="testimonial-content">{t.text}</p>
-                <div className="testimonial-author">
-                  <div className="author-info">
-                    <div 
-                      className="author-avatar" 
-                      style={{ backgroundImage: `url(https://i.pravatar.cc/150?img=${(i % 4) + 5})` }}
-                    ></div>
-                    <div className="author-details">
-                      <h4>{t.author}</h4>
-                      <p>{t.role}</p>
-                    </div>
-                  </div>
-                  <div className="social-icon">
-                    {socialIcons[t.social]}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+/* Homepage specific variables */
+.home-page {
+  --primary: #F59E0B;
+  --secondary: #FF6B35;
+  --accent: #2196F3;
+  --dark: #1a1a1a;
+  --gray: #666;
+  --light-gray: #999;
+  --bg-gradient: linear-gradient(135deg, #c9d6df 0%, #f2f2f2 100%);
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.1);
+  --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-full: 100px;
+  --transition: all 0.3s ease;
+  
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  color: var(--dark);
 }
 
-export default HomePage;
+/* Glass effect */
+.glass {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Homepage Navigation Override */
+.home-page .nav {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 24px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-page .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark);
+  text-decoration: none;
+}
+
+.home-page .logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.home-page .nav-links {
+  display: flex;
+  gap: 36px;
+  margin-left: 48px;
+}
+
+.home-page .nav-links a {
+  color: var(--dark);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.home-page .nav-links a:hover {
+  opacity: 0.7;
+}
+
+/* Hero Section */
+.home-page .hero {
+  text-align: center;
+  padding: 140px 20px 60px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.home-page .hero h1 {
+  font-size: clamp(48px, 8vw, 72px);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--dark);
+  margin-bottom: 24px;
+}
+
+.home-page .hero .highlight {
+  color: var(--primary);
+}
+
+.home-page .hero p {
+  font-size: 20px;
+  color: var(--dark);
+  opacity: 0.8;
+}
+
+/* Input Card */
+.home-page .input-card {
+  max-width: 820px;
+  margin: 0 auto 100px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255,255,255,0.3);
+  position: relative;
+}
+
+.home-page .input-area {
+  width: 100%;
+  min-height: 160px;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  color: var(--dark);
+  resize: none;
+  font-family: inherit;
+  background: rgba(248,249,250,0.9);
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.home-page .input-area:focus {
+  background: rgba(240,242,245,0.95);
+}
+
+.home-page .send-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 50px;
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-page .send-btn.active {
+  opacity: 1;
+}
+
+.home-page .send-btn:not(.active) {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.home-page .send-btn:hover {
+  transform: scale(1.1);
+  background: #D97706;
+}
+
+/* Suggestions */
+.home-page .suggestions {
+  margin-top: 40px;
+}
+
+.home-page .suggestions-label {
+  font-size: 14px;
+  color: var(--gray);
+  margin-bottom: 20px;
+}
+
+.home-page .suggestion-pills {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.home-page .pill {
+  padding: 10px 20px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  color: var(--gray);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.home-page .pill:hover {
+  background: white;
+  border-color: var(--accent);
+  color: var(--dark);
+}
+
+/* Trust Section */
+.home-page .trust-section {
+  text-align: center;
+  margin: 40px auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.home-page .trust-avatars {
+  display: flex;
+  margin-right: 8px;
+}
+
+.home-page .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  font-weight: 600;
+}
+
+.home-page .avatar:first-child { 
+  margin-left: 0; 
+}
+
+/* Results Section */
+.home-page .results-section {
+  display: none;
+  padding: 0 20px;
+}
+
+.home-page .results-section.show {
+  display: block;
+}
+
+.home-page .results-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.home-page .results-header h2 {
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 12px;
+}
+
+/* Floating Bubbles */
+.home-page .bubbles-container {
+  position: relative;
+  height: 400px;
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-page .bubble {
+  position: absolute;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  background: white;
+  border: 3px solid transparent;
+  animation: float 6s ease-in-out infinite;
+  overflow: hidden;
+}
+
+.home-page .bubble:hover {
+  transform: scale(1.1) translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.home-page .bubble.selected {
+  border-color: var(--accent);
+  background: #e3f2fd;
+  animation: none;
+  transform: scale(1.15);
+  border-radius: 20px;
+  width: auto !important;
+  height: auto !important;
+  min-width: 240px;
+  padding: 24px;
+}
+
+.home-page .bubble-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.home-page .bubble-metrics {
+  display: none;
+  width: 100%;
+  margin-top: 16px;
+  gap: 8px;
+}
+
+.home-page .bubble.selected .bubble-metrics {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-page .bubble-large {
+  width: 180px;
+  height: 180px;
+}
+
+.home-page .bubble-medium {
+  width: 150px;
+  height: 150px;
+}
+
+.home-page .bubble-small {
+  width: 120px;
+  height: 120px;
+}
+
+.home-page .bubble-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.home-page .bubble-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.home-page .bubble-match {
+  font-size: 12px;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(-5deg); }
+  75% { transform: translateY(20px) rotate(5deg); }
+}
+
+.home-page .bubble:nth-child(1) { animation-delay: 0s; }
+.home-page .bubble:nth-child(2) { animation-delay: 1s; }
+.home-page .bubble:nth-child(3) { animation-delay: 2s; }
+.home-page .bubble:nth-child(4) { animation-delay: 3s; }
+.home-page .bubble:nth-child(5) { animation-delay: 4s; }
+
+/* Metric Bars */
+.home-page .metric-item {
+  margin-top: 8px;
+}
+
+.home-page .metric-label {
+  font-size: 12px;
+  color: var(--light-gray);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.home-page .metric-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.home-page .metric-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, #FBBF24 100%);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* Loading State */
+.home-page .loading {
+  display: none;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.home-page .loading.show {
+  display: block;
+}
+
+.home-page .spinner {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 32px;
+  border: 3px solid transparent;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Testimonials */
+.home-page .testimonials-section {
+  padding: 100px 0;
+  background: transparent;
+  overflow: hidden;
+  position: relative;
+}
+
+.home-page .testimonials-container {
+  position: relative;
+  height: 500px;
+}
+
+.home-page .testimonial-row {
+  display: flex;
+  gap: 32px;
+  position: absolute;
+  width: max-content;
+  padding: 16px 0;
+}
+
+.home-page .testimonial-row.row-1 {
+  top: 0;
+  animation: scrollLeft 50s linear infinite;
+}
+
+.home-page .testimonial-row.row-2 {
+  top: 250px;
+  animation: scrollRight 50s linear infinite;
+}
+
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.home-page .testimonial-card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  width: 380px;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.home-page .testimonial-content {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.home-page .testimonial-author {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-page .author-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-page .author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.home-page .author-details h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--dark);
+}
+
+.home-page .author-details p {
+  font-size: 14px;
+  color: var(--gray);
+  margin: 0;
+}
+
+.home-page .social-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Homepage buttons */
+.home-page .btn {
+  border: none;
+  padding: 12px 28px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 16px;
+}
+
+.home-page .btn-dark {
+  background: var(--dark);
+  color: white;
+}
+
+.home-page .btn:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .home-page .nav { padding: 16px 24px; }
+  .home-page .nav-links { display: none; }
+  .home-page .hero h1 { font-size: 36px; }
+  .home-page .testimonial-card { min-width: 300px; }
+}
