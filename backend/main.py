@@ -7,6 +7,8 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import io
+from sklearn.cluster import KMeans
+import numpy as np
 
 # Load environment variables
 load_dotenv()
@@ -72,6 +74,32 @@ def clean_text(text):
     
     return text.strip()
 
+def cluster_posts_for_creator(creator: str, n_clusters: int = 4):
+    """Fetch posts for a creator, cluster by embedding, and update cluster_id."""
+    try:
+        response = supabase.table('creator_posts').select('id, embedding, post_content').eq('author', creator).execute()
+        posts = response.data
+
+        if not posts or len(posts) < n_clusters:
+            print(f"Not enough posts to cluster for {creator}")
+            return
+
+        embeddings = np.array([p['embedding'] for p in posts])
+        ids = [p['id'] for p in posts]
+        contents = [p['post_content'] for p in posts]
+
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        labels = kmeans.fit_predict(embeddings)
+
+        for post_id, cluster_id, content in zip(ids, labels, contents):
+            supabase.table('creator_posts').update({'cluster_id': int(cluster_id)}).eq('id', post_id).execute()
+            # Debug log for checking clustering results
+            print(f"[Cluster {cluster_id}] {content[:80]}...")
+
+        print(f"Clustered {len(posts)} posts for {creator} into {n_clusters} clusters.")
+    except Exception as e:
+        print(f"Error clustering posts for {creator}: {str(e)}")
+
 @app.get("/")
 async def root():
     return {"message": "Kaive AI Backend Running"}
@@ -83,50 +111,36 @@ async def upload_excel(file: UploadFile):
         if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
             raise HTTPException(400, "Please upload an Excel or CSV file")
         
-        # Read file content
         contents = await file.read()
-        
-        # Save to Supabase Storage
         file_path = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
-        storage_response = supabase.storage.from_("excel-files").upload(
-            file_path,
-            contents
-        )
+        supabase.storage.from_("excel-files").upload(file_path, contents)
         
-        # Create file record
         file_record = supabase.table('uploaded_files').insert({
             'filename': file.filename,
             'status': 'processing'
         }).execute()
         
-        # Read file based on extension
         if file.filename.endswith('.csv'):
             df = pd.read_csv(io.BytesIO(contents), encoding='utf-8')
         else:
             df = pd.read_excel(io.BytesIO(contents))
         
-        # Validate required columns
         required_columns = ['postContent', 'author', 'likeCount', 'commentCount', 'repostCount', 'postDate', 'postTimestamp']
         if not all(col in df.columns for col in required_columns):
             raise HTTPException(400, f"Excel must contain columns: {required_columns}")
         
-        # Process each post
         processed_count = 0
         for index, row in df.iterrows():
             try:
-                # Skip empty posts
                 if pd.isna(row['postContent']) or not str(row['postContent']).strip():
                     continue
                 
-                # Clean the content and author
                 content = clean_text(row['postContent'])
                 author = clean_text(row['author'])
                 
-                # Skip if content is empty after cleaning
                 if not content:
                     continue
                 
-                # Generate embedding
                 try:
                     response = openai.embeddings.create(
                         input=content,
@@ -137,17 +151,14 @@ async def upload_excel(file: UploadFile):
                     print(f"Error generating embedding for row {index}: {str(e)}")
                     embedding = None
                 
-                # Prepare data for insertion
                 post_data = {
                     'author': author,
                     'post_content': content,
                 }
                 
-                # Only add embedding if it was generated successfully
                 if embedding:
                     post_data['embedding'] = embedding
                 
-                # Add required fields
                 if 'postDate' in row and pd.notna(row['postDate']):
                     try:
                         post_data['post_date'] = pd.to_datetime(row['postDate']).strftime('%Y-%m-%d')
@@ -172,7 +183,6 @@ async def upload_excel(file: UploadFile):
                 else:
                     post_data['comment_count'] = 0
                 
-                # Add repostCount handling
                 if 'repostCount' in row and pd.notna(row['repostCount']):
                     try:
                         post_data['repost_count'] = int(float(str(row['repostCount']).replace(',', '')))
@@ -181,7 +191,6 @@ async def upload_excel(file: UploadFile):
                 else:
                     post_data['repost_count'] = 0
                 
-                # Add postTimestamp handling
                 if 'postTimestamp' in row and pd.notna(row['postTimestamp']):
                     try:
                         post_data['post_timestamp'] = pd.to_datetime(row['postTimestamp']).isoformat()
@@ -190,11 +199,9 @@ async def upload_excel(file: UploadFile):
                 else:
                     post_data['post_timestamp'] = datetime.now().isoformat()
                 
-                # Add optional postUrl if it exists
                 if 'postUrl' in row and pd.notna(row['postUrl']):
                     post_data['post_url'] = clean_text(row['postUrl'])
                 
-                # Insert into database
                 supabase.table('creator_posts').insert(post_data).execute()
                 processed_count += 1
                 
@@ -202,17 +209,22 @@ async def upload_excel(file: UploadFile):
                 print(f"Error processing row {index}: {str(e)}")
                 continue
         
-        # Update file status
         supabase.table('uploaded_files').update({
             'status': 'completed',
             'total_posts': processed_count
         }).eq('id', file_record.data[0]['id']).execute()
         
+        # Automatically cluster after posts are saved
+        if processed_count > 0:
+            first_author = df['author'].iloc[0]
+            cluster_posts_for_creator(first_author)
+        
         return {
             "status": "success",
             "filename": file.filename,
             "processed_posts": processed_count,
-            "total_rows": len(df)
+            "total_rows": len(df),
+            "clusters_created": True if processed_count > 0 else False
         }
         
     except Exception as e:
@@ -220,16 +232,10 @@ async def upload_excel(file: UploadFile):
 
 @app.get("/stats")
 async def get_stats():
-    """Get statistics about the data"""
     try:
-        # Get total posts
         posts_count = supabase.table('creator_posts').select('id', count='exact').execute()
-        
-        # Get unique authors
         authors = supabase.table('creator_posts').select('author').execute()
         unique_authors = len(set(post['author'] for post in authors.data))
-        
-        # Get processed files
         files = supabase.table('uploaded_files').select('*').execute()
         
         return {
