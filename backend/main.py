@@ -10,6 +10,7 @@ import io
 from sklearn.cluster import KMeans
 import numpy as np
 import json
+from generate_voice_profiles import generate_voice_profiles_after_clustering
 
 # Load environment variables
 load_dotenv()
@@ -145,6 +146,13 @@ def cluster_all_creators_in_file(df: pd.DataFrame):
             if creator:
                 print(f"\nClustering posts for: {creator}")
                 cluster_posts_for_creator(creator)
+                
+                # Generate voice profiles after clustering
+                print(f"Generating voice profiles for: {creator}")
+                try:
+                    generate_voice_profiles_after_clustering(creator)
+                except Exception as e:
+                    print(f"Error generating voice profiles for {creator}: {str(e)}")
     except Exception as e:
         print(f"Error clustering creators: {str(e)}")
 
@@ -271,7 +279,8 @@ async def upload_excel(file: UploadFile):
             "filename": file.filename,
             "processed_posts": processed_count,
             "total_rows": len(df),
-            "clusters_created": True if processed_count > 0 else False
+            "clusters_created": True if processed_count > 0 else False,
+            "voice_profiles_generated": True if processed_count > 0 else False
         }
         
     except Exception as e:
@@ -293,12 +302,13 @@ async def get_stats():
     except Exception as e:
         raise HTTPException(500, f"Error getting stats: {str(e)}")
 
-# New endpoint to manually trigger clustering for a specific creator
+# New endpoint to manually trigger clustering and voice profile generation
 @app.post("/cluster/{creator}")
 async def cluster_creator(creator: str):
     try:
         cluster_posts_for_creator(creator)
-        return {"status": "success", "message": f"Clustering completed for {creator}"}
+        generate_voice_profiles_after_clustering(creator)
+        return {"status": "success", "message": f"Clustering and voice profiles completed for {creator}"}
     except Exception as e:
         raise HTTPException(500, f"Error clustering posts: {str(e)}")
 
