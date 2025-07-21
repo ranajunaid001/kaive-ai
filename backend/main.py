@@ -9,6 +9,7 @@ from datetime import datetime
 import io
 from sklearn.cluster import KMeans
 import numpy as np
+import json
 
 # Load environment variables
 load_dotenv()
@@ -80,25 +81,72 @@ def cluster_posts_for_creator(creator: str, n_clusters: int = 4):
         response = supabase.table('creator_posts').select('id, embedding, post_content').eq('author', creator).execute()
         posts = response.data
 
-        if not posts or len(posts) < n_clusters:
-            print(f"Not enough posts to cluster for {creator}")
+        if not posts:
+            print(f"No posts found for {creator}")
             return
 
-        embeddings = np.array([p['embedding'] for p in posts])
-        ids = [p['id'] for p in posts]
-        contents = [p['post_content'] for p in posts]
+        # Filter out posts without embeddings and convert string embeddings to arrays
+        valid_posts = []
+        for p in posts:
+            if p.get('embedding'):
+                try:
+                    # Convert string to array if needed
+                    if isinstance(p['embedding'], str):
+                        p['embedding'] = json.loads(p['embedding'])
+                    valid_posts.append(p)
+                except Exception as e:
+                    print(f"Error processing embedding for post {p['id']}: {e}")
+                    continue
+        
+        if not valid_posts:
+            print(f"No valid embeddings available for {creator}.")
+            return
+        
+        # Adjust n_clusters if we have fewer posts
+        actual_clusters = min(n_clusters, len(valid_posts))
+        if actual_clusters < n_clusters:
+            print(f"Note: Only {len(valid_posts)} posts available. Adjusting from {n_clusters} to {actual_clusters} clusters.")
 
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-        labels = kmeans.fit_predict(embeddings)
+        embeddings = np.array([p['embedding'] for p in valid_posts])
+        ids = [p['id'] for p in valid_posts]
+        contents = [p['post_content'] for p in valid_posts]
 
+        # Run KMeans only if we have more than 1 post
+        if len(valid_posts) > 1:
+            kmeans = KMeans(n_clusters=actual_clusters, random_state=42, n_init=10)
+            labels = kmeans.fit_predict(embeddings)
+        else:
+            # If only 1 post, assign it to cluster 0
+            labels = [0]
+
+        # Update each post's cluster_id in Supabase
+        update_count = 0
         for post_id, cluster_id, content in zip(ids, labels, contents):
-            supabase.table('creator_posts').update({'cluster_id': int(cluster_id)}).eq('id', post_id).execute()
-            # Debug log for checking clustering results
-            print(f"[Cluster {cluster_id}] {content[:80]}...")
+            try:
+                supabase.table('creator_posts').update({'cluster_id': int(cluster_id)}).eq('id', post_id).execute()
+                update_count += 1
+                # Debug log for checking clustering results
+                print(f"[Cluster {cluster_id}] {content[:80]}...")
+            except Exception as e:
+                print(f"Error updating post {post_id}: {e}")
 
-        print(f"Clustered {len(posts)} posts for {creator} into {n_clusters} clusters.")
+        print(f"Clustered {update_count} posts for {creator} into {actual_clusters} clusters.")
     except Exception as e:
         print(f"Error clustering posts for {creator}: {str(e)}")
+
+def cluster_all_creators_in_file(df: pd.DataFrame):
+    """Cluster posts for all unique creators in the uploaded file."""
+    try:
+        unique_creators = df['author'].dropna().unique()
+        print(f"Found {len(unique_creators)} unique creators in the file")
+        
+        for creator in unique_creators:
+            creator = clean_text(creator)
+            if creator:
+                print(f"\nClustering posts for: {creator}")
+                cluster_posts_for_creator(creator)
+    except Exception as e:
+        print(f"Error clustering creators: {str(e)}")
 
 @app.get("/")
 async def root():
@@ -214,10 +262,9 @@ async def upload_excel(file: UploadFile):
             'total_posts': processed_count
         }).eq('id', file_record.data[0]['id']).execute()
         
-        # Automatically cluster after posts are saved
+        # Automatically cluster posts for ALL creators in the file after upload
         if processed_count > 0:
-            first_author = df['author'].iloc[0]
-            cluster_posts_for_creator(first_author)
+            cluster_all_creators_in_file(df)
         
         return {
             "status": "success",
@@ -245,6 +292,15 @@ async def get_stats():
         }
     except Exception as e:
         raise HTTPException(500, f"Error getting stats: {str(e)}")
+
+# New endpoint to manually trigger clustering for a specific creator
+@app.post("/cluster/{creator}")
+async def cluster_creator(creator: str):
+    try:
+        cluster_posts_for_creator(creator)
+        return {"status": "success", "message": f"Clustering completed for {creator}"}
+    except Exception as e:
+        raise HTTPException(500, f"Error clustering posts: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
