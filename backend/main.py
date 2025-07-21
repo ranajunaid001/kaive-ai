@@ -140,7 +140,9 @@ class OptimizedProcessor:
         
         # Parse dates efficiently
         valid_df['post_date'] = pd.to_datetime(valid_df['postDate'], errors='coerce').fillna(datetime.now()).dt.strftime('%Y-%m-%d')
-        valid_df['post_timestamp'] = pd.to_datetime(valid_df['postTimestamp'], errors='coerce').fillna(datetime.now()).dt.isoformat()
+        
+        # Fix for timestamp - apply isoformat to each value, not to the series
+        valid_df['post_timestamp'] = pd.to_datetime(valid_df['postTimestamp'], errors='coerce').fillna(datetime.now()).apply(lambda x: x.isoformat())
         
         # Parse numeric fields
         for col, new_col in [('likeCount', 'like_count'), ('commentCount', 'comment_count'), ('repostCount', 'repost_count')]:
