@@ -24,10 +24,7 @@ import time
 from collections import defaultdict
 
 # Import the fast version
-try:
-    from generate_voice_profiles_fast import generate_voice_profiles_after_clustering
-except ImportError:
-    from generate_voice_profiles import generate_voice_profiles_after_clustering
+from generate_voice_profiles import generate_voice_profiles_after_clustering
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
