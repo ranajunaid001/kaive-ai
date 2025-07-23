@@ -185,6 +185,167 @@ class OptimizedProcessor:
         
         return kmeans.fit_predict(embeddings)
 
+async def should_recluster(creator: str, new_post_count: int) -> bool:
+    """
+    Determine if we should recluster all posts or just cluster new ones
+    """
+    try:
+        # Get current post count for creator
+        response = supabase.table('creator_posts') \
+            .select('id', count='exact') \
+            .eq('author', creator) \
+            .execute()
+        
+        total_posts = response.count
+        
+        # Recluster if:
+        # 1. Creator has < 20 posts (small dataset benefits from full reclustering)
+        # 2. New posts are > 30% of total (significant change)
+        # 3. No clusters exist yet
+        
+        if total_posts < 20:
+            return True
+            
+        if new_post_count / total_posts > 0.3:
+            return True
+            
+        # Check if clusters exist
+        cluster_check = supabase.table('creator_posts') \
+            .select('cluster_id') \
+            .eq('author', creator) \
+            .not_.is_('cluster_id', 'null') \
+            .limit(1) \
+            .execute()
+            
+        if not cluster_check.data:
+            return True
+            
+        return False
+        
+    except Exception as e:
+        logger.error(f"Error in should_recluster: {e}")
+        return True  # Default to reclustering on error
+
+async def recluster_creator(creator: str):
+    """
+    Recluster all posts for a creator
+    """
+    try:
+        # Get all posts with embeddings
+        response = supabase.table('creator_posts') \
+            .select('id, embedding') \
+            .eq('author', creator) \
+            .execute()
+        
+        post_ids = []
+        embeddings = []
+        
+        for post in response.data:
+            if post.get('embedding'):
+                post_ids.append(post['id'])
+                if isinstance(post['embedding'], str):
+                    embeddings.append(json.loads(post['embedding']))
+                else:
+                    embeddings.append(post['embedding'])
+        
+        if embeddings:
+            processor = OptimizedProcessor()
+            await cluster_creator_optimized(creator, post_ids, embeddings, processor)
+            
+    except Exception as e:
+        logger.error(f"Error in recluster_creator: {e}")
+
+async def cluster_creator_optimized(creator: str, post_ids: List[int], embeddings: List[List[float]], processor):
+    """Optimized clustering for a single creator"""
+    try:
+        logger.info(f"Clustering {len(post_ids)} posts for {creator}")
+        
+        # Convert to numpy array
+        embeddings_array = np.array(embeddings)
+        
+        # Cluster
+        labels = processor.cluster_posts_batch(embeddings_array)
+        
+        # Batch update cluster IDs
+        updates = []
+        for post_id, cluster_id in zip(post_ids, labels):
+            updates.append({
+                'id': post_id,
+                'cluster_id': int(cluster_id)
+            })
+        
+        # Update in chunks
+        for i in range(0, len(updates), 50):
+            chunk = updates[i:i + 50]
+            for update in chunk:
+                supabase.table('creator_posts').update({
+                    'cluster_id': update['cluster_id']
+                }).eq('id', update['id']).execute()
+        
+        logger.info(f"✓ Clustered {creator}'s posts into {len(set(labels))} clusters")
+        
+    except Exception as e:
+        logger.error(f"Error clustering {creator}: {e}")
+
+async def deduplicate_posts(posts_to_insert: List[Dict], texts_for_embedding: List[str]) -> Tuple[Dict, int]:
+    """
+    Deduplicate posts against existing database content
+    Returns: (unique_posts_dict, duplicate_count)
+    """
+    # Group posts by author for efficient checking
+    posts_by_author = defaultdict(list)
+    for i, post in enumerate(posts_to_insert):
+        posts_by_author[post['author']].append((i, post))
+    
+    unique_posts = []
+    unique_texts = []
+    duplicate_count = 0
+    
+    # Check each author's posts
+    for author, author_posts in posts_by_author.items():
+        # Get existing posts for this author
+        existing_response = supabase.table('creator_posts') \
+            .select('post_content, post_url') \
+            .eq('author', author) \
+            .execute()
+        
+        # Create a set of existing content for fast lookup
+        # Use first 200 chars for comparison to handle minor edits
+        existing_content = {
+            post['post_content'][:200]: post 
+            for post in existing_response.data
+        }
+        
+        existing_urls = {
+            post.get('post_url') 
+            for post in existing_response.data 
+            if post.get('post_url')
+        }
+        
+        # Check each post
+        for idx, post in author_posts:
+            content_key = post['post_content'][:200]
+            post_url = post.get('post_url')
+            
+            # Check if duplicate by content or URL
+            is_duplicate = (
+                content_key in existing_content or 
+                (post_url and post_url in existing_urls)
+            )
+            
+            if is_duplicate:
+                duplicate_count += 1
+                logger.debug(f"Skipping duplicate post for {author}")
+            else:
+                unique_posts.append(post)
+                unique_texts.append(texts_for_embedding[idx])
+                # Add to existing set to catch duplicates within the same file
+                existing_content[content_key] = post
+                if post_url:
+                    existing_urls.add(post_url)
+    
+    return {'posts': unique_posts, 'texts': unique_texts}, duplicate_count
+
 async def process_file_optimized(contents: bytes, filename: str, file_record_id: str):
     """Optimized file processing pipeline with deduplication"""
     start_time = time.time()
@@ -267,7 +428,7 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                     creator
                 )
         
-        # 9. Update file status with detailed stats
+        # 9. Update file status with detailed stats - FIXED: removed 'error' field
         supabase.table('uploaded_files').update({
             'status': 'completed',
             'total_posts': len(inserted_ids),
@@ -284,154 +445,11 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         
     except Exception as e:
         logger.error(f"Error processing file: {e}")
+        # FIXED: Only update 'status' field, not 'error'
         supabase.table('uploaded_files').update({
-            'status': 'failed',
-            'error': str(e)
+            'status': 'failed'
         }).eq('id', file_record_id).execute()
         raise
-
-async def deduplicate_posts(posts_to_insert: List[Dict], texts_for_embedding: List[str]) -> Tuple[Dict, int]:
-    """
-    Deduplicate posts against existing database content
-    Returns: (unique_posts_dict, duplicate_count)
-    """
-    # Group posts by author for efficient checking
-    posts_by_author = defaultdict(list)
-    for i, post in enumerate(posts_to_insert):
-        posts_by_author[post['author']].append((i, post))
-    
-    unique_posts = []
-    unique_texts = []
-    duplicate_count = 0
-    
-    # Check each author's posts
-    for author, author_posts in posts_by_author.items():
-        # Get existing posts for this author
-        existing_response = supabase.table('creator_posts') \
-            .select('post_content, post_url') \
-            .eq('author', author) \
-            .execute()
-        
-        # Create a set of existing content for fast lookup
-        # Use first 200 chars for comparison to handle minor edits
-        existing_content = {
-            post['post_content'][:200]: post 
-            for post in existing_response.data
-        }
-        
-        existing_urls = {
-            post.get('post_url') 
-            for post in existing_response.data 
-            if post.get('post_url')
-        }
-        
-        # Check each post
-        for idx, post in author_posts:
-            content_key = post['post_content'][:200]
-            post_url = post.get('post_url')
-            
-            # Check if duplicate by content or URL
-            is_duplicate = (
-                content_key in existing_content or 
-                (post_url and post_url in existing_urls)
-            )
-            
-            if is_duplicate:
-                duplicate_count += 1
-                logger.debug(f"Skipping duplicate post for {author}")
-            else:
-                unique_posts.append(post)
-                unique_texts.append(texts_for_embedding[idx])
-                # Add to existing set to catch duplicates within the same file
-                existing_content[content_key] = post
-                if post_url:
-                    existing_urls.add(post_url)
-    
-    return {'posts': unique_posts, 'texts': unique_texts}, duplicate_count
-
-async def update_existing_posts(posts_to_update: List[Dict]) -> int:
-    """
-    Update existing posts with new engagement metrics
-    """
-    updated_count = 0
-    
-    for post in posts_to_update:
-        try:
-            # Find existing post by content or URL
-            query = supabase.table('creator_posts').select('id')
-            
-            if post.get('post_url'):
-                query = query.eq('post_url', post['post_url'])
-            else:
-                # Match by author and content start
-                query = query.eq('author', post['author']) \
-                           .like('post_content', f"{post['post_content'][:100]}%")
-            
-            existing = query.execute()
-            
-            if existing.data:
-                # Update engagement metrics only if they're higher
-                post_id = existing.data[0]['id']
-                
-                # Get current metrics
-                current = supabase.table('creator_posts') \
-                    .select('like_count, comment_count, repost_count') \
-                    .eq('id', post_id) \
-                    .execute()
-                
-                if current.data:
-                    current_data = current.data[0]
-                    
-                    # Update only if new metrics are higher
-                    updates = {}
-                    if post['like_count'] > current_data['like_count']:
-                        updates['like_count'] = post['like_count']
-                    if post['comment_count'] > current_data['comment_count']:
-                        updates['comment_count'] = post['comment_count']
-                    if post['repost_count'] > current_data['repost_count']:
-                        updates['repost_count'] = post['repost_count']
-                    
-                    if updates:
-                        supabase.table('creator_posts') \
-                            .update(updates) \
-                            .eq('id', post_id) \
-                            .execute()
-                        updated_count += 1
-                        
-        except Exception as e:
-            logger.error(f"Error updating post: {e}")
-            
-    return updated_count
-    """Optimized clustering for a single creator"""
-    try:
-        logger.info(f"Clustering {len(post_ids)} posts for {creator}")
-        
-        # Convert to numpy array
-        embeddings_array = np.array(embeddings)
-        
-        # Cluster
-        labels = processor.cluster_posts_batch(embeddings_array)
-        
-        # Batch update cluster IDs
-        updates = []
-        for post_id, cluster_id in zip(post_ids, labels):
-            updates.append({
-                'id': post_id,
-                'cluster_id': int(cluster_id)
-            })
-        
-        # Update in chunks
-        for i in range(0, len(updates), 50):
-            chunk = updates[i:i + 50]
-            for update in chunk:
-                supabase.table('creator_posts').update({
-                    'cluster_id': update['cluster_id']
-                }).eq('id', update['id']).execute()
-        
-        logger.info(f"✓ Clustered {creator}'s posts into {len(set(labels))} clusters")
-        
-    except Exception as e:
-        logger.error(f"Error clustering {creator}: {e}")
 
 @app.get("/")
 async def root():
