@@ -418,12 +418,20 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                     processor = OptimizedProcessor()
                     await cluster_creator_optimized(creator, data['ids'], data['embeddings'], processor)
                 
-                # Always regenerate voice profiles after changes
-                await asyncio.get_event_loop().run_in_executor(
-                    executor,
-                    generate_voice_profiles_after_clustering,
-                    creator
-                )
+               # Always regenerate voice profiles after changes
+                logger.info(f"Starting voice profile generation for {creator}...")
+                try:
+                    result = await asyncio.get_event_loop().run_in_executor(
+                        executor,
+                        generate_voice_profiles_after_clustering,
+                        creator
+                    )
+                    logger.info(f"✅ Voice profiles generated for {creator}: {result} profiles created")
+                except Exception as e:
+                    logger.error(f"❌ Voice profile generation FAILED for {creator}: {str(e)}")
+                    logger.error(f"Error type: {type(e).__name__}")
+                    import traceback
+                    logger.error(f"Traceback: {traceback.format_exc()}")
         
         # 9. Update file status with detailed stats - FIXED: removed 'error' field
         supabase.table('uploaded_files').update({
