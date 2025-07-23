@@ -398,18 +398,24 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         
         logger.info(f"Inserted {len(inserted_ids)} posts")
         
-        # 6. Cluster by creator
+       # 6. Cluster by creator
         creators_data = defaultdict(lambda: {'ids': [], 'embeddings': []})
+        
+        logger.info(f"Building creators_data from {len(inserted_ids)} inserted posts...")
         
         for post_id, post, embedding in zip(inserted_ids, posts_to_insert, embeddings):
             if embedding:
                 creators_data[post['author']]['ids'].append(post_id)
                 creators_data[post['author']]['embeddings'].append(embedding)
         
+        logger.info(f"creators_data has {len(creators_data)} creators: {list(creators_data.keys())}")
+        
         # 7. Smart clustering strategy
         for creator, data in creators_data.items():
+            logger.info(f"Processing creator: {creator} with {len(data['ids'])} posts")
             new_count = len(data['ids'])
             if new_count > 0:
+                
                 # Check if we should recluster ALL posts or just cluster new ones
                 if await should_recluster(creator, new_count):
                     await recluster_creator(creator)
