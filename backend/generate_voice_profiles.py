@@ -292,48 +292,25 @@ class FastVoiceProfileGenerator:
         success_count = 0
         
         try:
-            # Group by operation type
-            to_update = []
-            to_insert = []
-            
-            # Check existing profiles in one query
-            creators_clusters = [(p['creator'], p['cluster_id']) for p in profiles_data]
-            
-            # Build query to check all at once
-            existing_check = self.supabase.table("creator_voice_profiles").select("creator, cluster_id")
-            
-            for creator, cluster_id in creators_clusters[:1]:  # Start with first
-                existing_check = existing_check.eq("creator", creator).eq("cluster_id", cluster_id)
-            
-            for creator, cluster_id in creators_clusters[1:]:  # Add others with OR
-                existing_check = existing_check.or_(f"creator.eq.{creator},cluster_id.eq.{cluster_id}")
-            
-            existing_response = existing_check.execute()
-            existing_set = {(p['creator'], p['cluster_id']) for p in existing_response.data}
-            
-            # Separate updates and inserts
+            # Simple approach - just try to insert all
+            # If they exist, they'll fail but we'll count successes
             for profile in profiles_data:
-                key = (profile['creator'], profile['cluster_id'])
-                if key in existing_set:
-                    to_update.append(profile)
-                else:
-                    to_insert.append(profile)
-            
-            # Batch insert
-            if to_insert:
-                self.supabase.table("creator_voice_profiles").insert(to_insert).execute()
-                success_count += len(to_insert)
-            
-            # Batch update (unfortunately Supabase doesn't support bulk updates easily)
-            # But we can still optimize by using upsert
-            if to_update:
-                for profile in to_update:
-                    self.supabase.table("creator_voice_profiles") \
-                        .update(profile) \
-                        .eq("creator", profile['creator']) \
-                        .eq("cluster_id", profile['cluster_id']) \
-                        .execute()
+                try:
+                    self.supabase.table("creator_voice_profiles").insert(profile).execute()
                     success_count += 1
+                    logger.info(f"Inserted profile for {profile['creator']} cluster {profile['cluster_id']}")
+                except Exception as e:
+                    # Profile might already exist, try update
+                    try:
+                        self.supabase.table("creator_voice_profiles") \
+                            .update(profile) \
+                            .eq("creator", profile['creator']) \
+                            .eq("cluster_id", profile['cluster_id']) \
+                            .execute()
+                        success_count += 1
+                        logger.info(f"Updated profile for {profile['creator']} cluster {profile['cluster_id']}")
+                    except Exception as update_error:
+                        logger.error(f"Failed to save profile: {update_error}")
             
             return success_count
             
