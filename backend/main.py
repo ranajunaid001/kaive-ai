@@ -414,46 +414,98 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                 creators_data[post['author']]['ids'].append(post_id)
                 creators_data[post['author']]['embeddings'].append(embedding)
         
-        # 7. Smart clustering strategy
+        # 7. Smart clustering strategy with ENHANCED DEBUGGING
         voice_profiles_created = 0
-        for creator, data in creators_data.items():
-            new_count = len(data['ids'])
-            if new_count > 0:
-                # Check if we should recluster ALL posts or just cluster new ones
-                if await should_recluster(creator, new_count):
-                    await recluster_creator(creator)
+        
+        # Get all unique creators from the file (not just new posts)
+        all_creators = set([post['author'] for post in posts_to_insert])
+        logger.info(f"Found {len(all_creators)} unique creators in file")
+        
+        for creator in all_creators:
+            logger.info(f"Processing creator: {creator}")
+            
+            # Check if we have new data for this creator
+            creator_has_new_data = creator in creators_data
+            new_count = len(creators_data.get(creator, {}).get('ids', []))
+            
+            logger.info(f"  - Has new data: {creator_has_new_data}")
+            logger.info(f"  - New post count: {new_count}")
+            
+            # Always process voice profiles for creators in the file
+            try:
+                if creator_has_new_data and new_count > 0:
+                    # New posts - decide on clustering strategy
+                    if await should_recluster(creator, new_count):
+                        logger.info(f"  - Reclustering ALL posts for {creator}")
+                        await recluster_creator(creator)
+                    else:
+                        logger.info(f"  - Clustering only NEW posts for {creator}")
+                        data = creators_data[creator]
+                        await cluster_creator_optimized(creator, data['ids'], data['embeddings'], processor)
                 else:
-                    # Just cluster the new posts
-                    processor = OptimizedProcessor()
-                    await cluster_creator_optimized(creator, data['ids'], data['embeddings'], processor)
+                    # No new posts but creator exists in file - ensure they have profiles
+                    logger.info(f"  - No new posts for {creator}, checking if profiles exist")
+                    
+                    # Check if creator has posts in database
+                    check_response = supabase.table('creator_posts') \
+                        .select('id', count='exact') \
+                        .eq('author', creator) \
+                        .execute()
+                    
+                    if check_response.count > 0:
+                        logger.info(f"  - Found {check_response.count} existing posts for {creator}")
+                        # Check if voice profiles exist
+                        profile_check = supabase.table('creator_voice_profiles') \
+                            .select('id', count='exact') \
+                            .eq('creator', creator) \
+                            .execute()
+                        
+                        if profile_check.count == 0:
+                            logger.info(f"  - No voice profiles found, triggering generation")
+                            await recluster_creator(creator)
+                        else:
+                            logger.info(f"  - Voice profiles already exist ({profile_check.count} profiles)")
+                            continue
+                    else:
+                        logger.info(f"  - No posts found for {creator} in database")
+                        continue
                 
-                # Always regenerate voice profiles after changes
+                # Generate voice profiles
                 logger.info(f"Starting voice profile generation for {creator}...")
-                try:
-                    result = await asyncio.get_event_loop().run_in_executor(
-                        executor,
-                        generate_voice_profiles_after_clustering,
-                        creator
-                    )
-                    logger.info(f"✅ Voice profiles generated for {creator}: {result} profiles created")
-                    voice_profiles_created += result
-                    
-                    # UPDATE STATUS: Voice profiles created
-                    supabase.table('uploaded_files').update({
-                        'status': 'completed',
-                        'voice_profiles_count': voice_profiles_created
-                    }).eq('id', file_record_id).execute()
-                    
-                except Exception as e:
-                    logger.error(f"❌ Voice profile generation FAILED for {creator}: {str(e)}")
-                    logger.error(f"Error type: {type(e).__name__}")
-                    import traceback
-                    logger.error(f"Traceback: {traceback.format_exc()}")
-                    
-                    # UPDATE STATUS: Voice profile failed
-                    supabase.table('uploaded_files').update({
-                        'status': 'voice_profile_failed'
-                    }).eq('id', file_record_id).execute()
+                logger.info(f"  - Current working directory: {os.getcwd()}")
+                logger.info(f"  - Python path: {sys.path}")
+                
+                # Check if function is imported correctly
+                logger.info(f"  - Function exists: {generate_voice_profiles_after_clustering}")
+                logger.info(f"  - Function module: {generate_voice_profiles_after_clustering.__module__}")
+                
+                result = await asyncio.get_event_loop().run_in_executor(
+                    executor,
+                    generate_voice_profiles_after_clustering,
+                    creator
+                )
+                
+                logger.info(f"✅ Voice profiles generated for {creator}: {result} profiles created")
+                voice_profiles_created += result
+                
+                # UPDATE STATUS: Voice profiles created
+                supabase.table('uploaded_files').update({
+                    'status': 'completed',
+                    'voice_profiles_count': voice_profiles_created
+                }).eq('id', file_record_id).execute()
+                
+            except Exception as e:
+                logger.error(f"❌ Voice profile generation FAILED for {creator}: {str(e)}")
+                logger.error(f"  - Error type: {type(e).__name__}")
+                import traceback
+                logger.error(f"  - Full traceback:")
+                logger.error(traceback.format_exc())
+                
+                # UPDATE STATUS: Voice profile failed
+                supabase.table('uploaded_files').update({
+                    'status': 'voice_profile_failed',
+                    'error_message': str(e)
+                }).eq('id', file_record_id).execute()
         
         elapsed = time.time() - start_time
         logger.info(f"✓ Processed {filename} in {elapsed:.2f} seconds")
@@ -465,9 +517,13 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         
     except Exception as e:
         logger.error(f"Error processing file: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        
         # UPDATE STATUS: Failed
         supabase.table('uploaded_files').update({
-            'status': 'failed'
+            'status': 'failed',
+            'error_message': str(e)
         }).eq('id', file_record_id).execute()
         raise
 
