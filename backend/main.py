@@ -479,30 +479,22 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                         logger.info(f"  - No posts found for {creator} in database")
                         continue
                 
-                # CRITICAL: Add explicit logging here
-                logger.info(f"=== ATTEMPTING VOICE PROFILE GENERATION FOR {creator} ===")
-                
                 # Generate voice profiles
                 logger.info(f"Starting voice profile generation for {creator}...")
                 logger.info(f"  - Current working directory: {os.getcwd()}")
                 logger.info(f"  - Python path: {sys.path}")
                 
                 # Check if function is imported correctly
-                try:
-                    logger.info(f"  - Function exists: {generate_voice_profiles_after_clustering}")
-                    logger.info(f"  - Function module: {generate_voice_profiles_after_clustering.__module__}")
-                except Exception as e:
-                    logger.error(f"  - Error checking function: {e}")
+                logger.info(f"  - Function exists: {generate_voice_profiles_after_clustering}")
+                logger.info(f"  - Function module: {generate_voice_profiles_after_clustering.__module__}")
                 
-                try:
-                    logger.info(f"  - About to call generate_voice_profiles_after_clustering...")
-                    result = await asyncio.get_event_loop().run_in_executor(
-                        executor,
-                        generate_voice_profiles_after_clustering,
-                        creator
-                    )
-                    
-                    logger.info(f"✅ Voice profiles generated for {creator}: {result} profiles created")
+                result = await asyncio.get_event_loop().run_in_executor(
+                    executor,
+                    generate_voice_profiles_after_clustering,
+                    creator
+                )
+                
+                logger.info(f"✅ Voice profiles generated for {creator}: {result} profiles created")
                 voice_profiles_created += result
                 
                 # UPDATE STATUS: Voice profiles created
