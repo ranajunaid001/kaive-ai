@@ -603,7 +603,7 @@ async def get_processing_status(file_id: str):
     """Check the status of file processing"""
     try:
         response = supabase.table('uploaded_files') \
-            .select('status, total_posts, filename, new_posts, duplicate_posts, voice_profiles_count') \
+            .select('*') \
             .eq('id', file_id) \
             .execute()
         
