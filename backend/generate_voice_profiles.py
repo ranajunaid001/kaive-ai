@@ -234,52 +234,6 @@ class FastVoiceProfileGenerator:
         
         return selected[:6]
     
-    async def generate_ai_descriptions_batch(self, clusters_data: Dict[int, Tuple[str, List[Dict], int]]) -> Dict[int, Tuple[str, str]]:
-        """Generate all AI descriptions in parallel"""
-        
-        async def generate_single_description(cluster_id: int, creator: str, posts: List[Dict], total_posts: int) -> Tuple[int, str, str]:
-            """Generate description for a single cluster"""
-            
-            prompt = self._build_prompt(creator, cluster_id, posts, total_posts)
-            
-            try:
-                # Use async OpenAI call
-                response = await asyncio.get_event_loop().run_in_executor(
-                    None,
-                    lambda: openai.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "system", "content": "You are an expert at analyzing content patterns."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.7,
-                        max_tokens=150,
-                        timeout=10
-                    )
-                )
-                
-                # Parse response
-                content = response.choices[0].message.content
-                name, description = self._parse_ai_response(content)
-                
-                return cluster_id, name, description
-                
-            except Exception as e:
-                logger.warning(f"AI generation failed for cluster {cluster_id}: {e}")
-                return cluster_id, f"Content Series {cluster_id + 1}", f"A collection of posts in cluster {cluster_id}"
-        
-        # Create all tasks
-        tasks = []
-        for cluster_id, (creator, posts, total_posts) in clusters_data.items():
-            task = generate_single_description(cluster_id, creator, posts, total_posts)
-            tasks.append(task)
-        
-        # Run all tasks in parallel
-        results = await asyncio.gather(*tasks)
-        
-        # Convert to dict
-        return {cluster_id: (name, desc) for cluster_id, name, desc in results}
-    
     def _build_prompt(self, creator: str, cluster_id: int, posts: List[Dict], total_posts: int) -> str:
         """Build prompt efficiently"""
         prompt_parts = [
@@ -305,6 +259,30 @@ class FastVoiceProfileGenerator:
                 description = line[12:].strip().strip('"\'')[:200]
         
         return name or "Content Series", description or "A collection of related posts"
+    
+    def _generate_single_description_sync(self, creator: str, cluster_id: int, posts: List[Dict], total_posts: int) -> Tuple[str, str]:
+        """Synchronous version of description generation"""
+        prompt = self._build_prompt(creator, cluster_id, posts, total_posts)
+        
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are an expert at analyzing content patterns."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=150,
+                timeout=10
+            )
+            
+            content = response.choices[0].message.content
+            name, description = self._parse_ai_response(content)
+            return name, description
+            
+        except Exception as e:
+            logger.warning(f"AI generation failed: {e}")
+            return f"Content Series {cluster_id + 1}", f"A collection of posts in cluster {cluster_id}"
     
     def batch_save_profiles(self, profiles_data: List[Dict]) -> int:
         """Save all profiles in a single batch operation"""
@@ -403,9 +381,7 @@ class FastVoiceProfileGenerator:
                 representative = self.get_representative_posts_fast(posts)
                 ai_tasks[cluster_id] = (creator, representative, len(posts))
             
-            # 6. GENERATE AI DESCRIPTIONS - In parallel
-            loop = asyncio.new_event_loop()
-            # Replace with synchronous version:
+            # 6. GENERATE AI DESCRIPTIONS - SYNCHRONOUSLY (FIXED)
             ai_descriptions = {}
             for cluster_id, (creator, posts, total_posts) in ai_tasks.items():
                 try:
@@ -414,7 +390,6 @@ class FastVoiceProfileGenerator:
                 except Exception as e:
                     logger.warning(f"AI generation failed for cluster {cluster_id}: {e}")
                     ai_descriptions[cluster_id] = (f"Cluster {cluster_id}", f"Posts in cluster {cluster_id}")
-            loop.close()
             
             # 7. BUILD ALL PROFILES
             profiles_data = []
@@ -554,8 +529,8 @@ def generate_all_voice_profiles():
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage:")
-        print("  python generate_voice_profiles_fast.py 'Creator Name'")
-        print("  python generate_voice_profiles_fast.py --all")
+        print("  python generate_voice_profiles.py 'Creator Name'")
+        print("  python generate_voice_profiles.py --all")
         sys.exit(1)
     
     if sys.argv[1] == "--all":
