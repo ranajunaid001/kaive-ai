@@ -447,10 +447,12 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                     if await should_recluster(creator, new_count):
                         logger.info(f"  - Reclustering ALL posts for {creator}")
                         await recluster_creator(creator)
+                        logger.info(f"  - Reclustering completed, proceeding to voice profile generation")
                     else:
                         logger.info(f"  - Clustering only NEW posts for {creator}")
                         data = creators_data[creator]
                         await cluster_creator_optimized(creator, data['ids'], data['embeddings'], processor)
+                        logger.info(f"  - Clustering completed, proceeding to voice profile generation")
                 else:
                     # No new posts but creator exists in file - ensure they have profiles
                     logger.info(f"  - No new posts for {creator}, checking if profiles exist")
