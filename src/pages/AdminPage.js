@@ -11,6 +11,7 @@ function AdminPage({ onNavigate }) {
     files_processed: 0
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState(null);
 
   const creators = [
     { id: 1, name: 'Sarah Chen', title: 'Product Designer at Meta', posts: '1.2K', match: '89%', rating: '4.8', emoji: '👩‍💻' },
@@ -39,6 +40,13 @@ function AdminPage({ onNavigate }) {
 
     try {
       setIsUploading(true);
+      
+      // Initial status
+      setUploadStatus({
+        stage: 'uploading',
+        message: `📤 Uploading "${file.name}"...`
+      });
+
       const response = await fetch('https://kaive-ai-production-7be5.up.railway.app/upload', {
         method: 'POST',
         body: formData
@@ -47,17 +55,113 @@ function AdminPage({ onNavigate }) {
       const result = await response.json();
       console.log('Upload result:', result);
 
-      if (result.status === 'success') {
-        alert(`Successfully processed ${result.processed_posts} posts from ${file.name}`);
-        fetchStats(); // Refresh stats after upload
+      if (result.status === 'processing' && result.file_id) {
+        // Poll for status updates
+        const checkStatus = async () => {
+          try {
+            const statusResponse = await fetch(`https://kaive-ai-production-7be5.up.railway.app/processing-status/${result.file_id}`);
+            const statusData = await statusResponse.json();
+            
+            switch(statusData.status) {
+              case 'posts_saved':
+                setUploadStatus({
+                  stage: 'posts_saved',
+                  message: `✅ Stage 1 Complete: ${statusData.total_posts} posts uploaded to database\n⏳ Stage 2: Generating voice profiles...`,
+                  posts: statusData.total_posts,
+                  newPosts: statusData.new_posts,
+                  duplicates: statusData.duplicate_posts
+                });
+                return false; // Keep polling
+                
+              case 'completed':
+                setUploadStatus({
+                  stage: 'completed',
+                  message: `✅ Stage 1 Complete: ${statusData.total_posts} posts uploaded to database\n✅ Stage 2 Complete: Voice profiles created\n🎉 File processing complete!`,
+                  posts: statusData.total_posts,
+                  newPosts: statusData.new_posts,
+                  duplicates: statusData.duplicate_posts,
+                  voiceProfiles: statusData.voice_profiles_count
+                });
+                fetchStats(); // Refresh stats
+                return true; // Stop polling
+                
+              case 'voice_profile_failed':
+                setUploadStatus({
+                  stage: 'partial_success',
+                  message: `✅ Stage 1 Complete: ${statusData.total_posts} posts uploaded to database\n❌ Stage 2 Failed: Voice profile generation error`,
+                  posts: statusData.total_posts,
+                  newPosts: statusData.new_posts,
+                  duplicates: statusData.duplicate_posts
+                });
+                return true; // Stop polling
+                
+              case 'failed':
+                setUploadStatus({
+                  stage: 'failed',
+                  message: `❌ Processing failed for ${file.name}`
+                });
+                return true; // Stop polling
+                
+              default:
+                return false; // Keep polling
+            }
+          } catch (error) {
+            console.error('Status check error:', error);
+            return false;
+          }
+        };
+
+        // Check status immediately
+        await checkStatus();
+        
+        // Then check every 2 seconds
+        const interval = setInterval(async () => {
+          const isDone = await checkStatus();
+          if (isDone) {
+            clearInterval(interval);
+            setIsUploading(false);
+            
+            // Keep success message visible for 10 seconds
+            setTimeout(() => {
+              setUploadStatus(null);
+            }, 10000);
+          }
+        }, 2000);
+
+        // Timeout after 2 minutes
+        setTimeout(() => {
+          clearInterval(interval);
+          setIsUploading(false);
+          setUploadStatus(prev => ({
+            ...prev,
+            message: prev.message + '\n⚠️ Processing is taking longer than expected. Check back later.'
+          }));
+        }, 120000);
+        
       } else {
-        alert(`Error: ${result.detail || 'Upload failed'}`);
+        setUploadStatus({
+          stage: 'failed',
+          message: `❌ Error: ${result.detail || 'Upload failed'}`
+        });
+        setIsUploading(false);
+        
+        // Clear error after 5 seconds
+        setTimeout(() => {
+          setUploadStatus(null);
+        }, 5000);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Error uploading file: ' + error.message);
-    } finally {
+      setUploadStatus({
+        stage: 'failed',
+        message: `❌ Error uploading file: ${error.message}`
+      });
       setIsUploading(false);
+      
+      // Clear error after 5 seconds
+      setTimeout(() => {
+        setUploadStatus(null);
+      }, 5000);
     }
   };
 
@@ -158,6 +262,29 @@ function AdminPage({ onNavigate }) {
               />
             </label>
           </div>
+
+          {/* Status Messages */}
+          {uploadStatus && (
+            <div style={{
+              marginTop: '20px',
+              padding: '20px',
+              background: uploadStatus.stage === 'failed' ? '#fee2e2' : '#f3f4f6',
+              borderRadius: '12px',
+              border: uploadStatus.stage === 'failed' ? '1px solid #fecaca' : '1px solid #e5e7eb',
+              whiteSpace: 'pre-line'
+            }}>
+              {uploadStatus.message}
+              
+              {/* Show additional details if available */}
+              {uploadStatus.newPosts !== undefined && uploadStatus.duplicates !== undefined && (
+                <div style={{ marginTop: '10px', fontSize: '14px', color: '#6b7280' }}>
+                  {uploadStatus.newPosts > 0 && `• ${uploadStatus.newPosts} new posts added`}
+                  {uploadStatus.duplicates > 0 && uploadStatus.newPosts > 0 && <br />}
+                  {uploadStatus.duplicates > 0 && `• ${uploadStatus.duplicates} duplicate posts skipped`}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Uploaded Files List */}
           {uploadedFiles.length > 0 && (
