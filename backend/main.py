@@ -417,11 +417,20 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         # 7. Smart clustering strategy with ENHANCED DEBUGGING
         voice_profiles_created = 0
         
-        # Get all unique creators from the file (not just new posts)
-        all_creators = set([post['author'] for post in posts_to_insert])
-        logger.info(f"Found {len(all_creators)} unique creators in file")
+        # Get all unique creators from the ORIGINAL file data (before deduplication)
+        # This ensures we process voice profiles even if all posts were duplicates
+        all_creators_in_file = set()
+        for _, row in df.iterrows():
+            author = clean_text(row.get('author', ''))
+            if author:
+                all_creators_in_file.add(author)
         
-        for creator in all_creators:
+        logger.info(f"Found {len(all_creators_in_file)} unique creators in file")
+        
+        # Also get creators from new posts
+        creators_with_new_posts = set([post['author'] for post in posts_to_insert])
+        
+        for creator in all_creators_in_file:
             logger.info(f"Processing creator: {creator}")
             
             # Check if we have new data for this creator
