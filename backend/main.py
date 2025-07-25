@@ -398,24 +398,27 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         
         logger.info(f"Inserted {len(inserted_ids)} posts")
         
-       # 6. Cluster by creator
-        creators_data = defaultdict(lambda: {'ids': [], 'embeddings': []})
+        # UPDATE STATUS: Posts saved
+        supabase.table('uploaded_files').update({
+            'status': 'posts_saved',
+            'total_posts': len(inserted_ids),
+            'new_posts': len(inserted_ids),
+            'duplicate_posts': existing_count
+        }).eq('id', file_record_id).execute()
         
-        logger.info(f"Building creators_data from {len(inserted_ids)} inserted posts...")
+        # 6. Cluster by creator
+        creators_data = defaultdict(lambda: {'ids': [], 'embeddings': []})
         
         for post_id, post, embedding in zip(inserted_ids, posts_to_insert, embeddings):
             if embedding:
                 creators_data[post['author']]['ids'].append(post_id)
                 creators_data[post['author']]['embeddings'].append(embedding)
         
-        logger.info(f"creators_data has {len(creators_data)} creators: {list(creators_data.keys())}")
-        
         # 7. Smart clustering strategy
+        voice_profiles_created = 0
         for creator, data in creators_data.items():
-            logger.info(f"Processing creator: {creator} with {len(data['ids'])} posts")
             new_count = len(data['ids'])
             if new_count > 0:
-                
                 # Check if we should recluster ALL posts or just cluster new ones
                 if await should_recluster(creator, new_count):
                     await recluster_creator(creator)
@@ -424,7 +427,7 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                     processor = OptimizedProcessor()
                     await cluster_creator_optimized(creator, data['ids'], data['embeddings'], processor)
                 
-               # Always regenerate voice profiles after changes
+                # Always regenerate voice profiles after changes
                 logger.info(f"Starting voice profile generation for {creator}...")
                 try:
                     result = await asyncio.get_event_loop().run_in_executor(
@@ -433,30 +436,36 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                         creator
                     )
                     logger.info(f"✅ Voice profiles generated for {creator}: {result} profiles created")
+                    voice_profiles_created += result
+                    
+                    # UPDATE STATUS: Voice profiles created
+                    supabase.table('uploaded_files').update({
+                        'status': 'completed',
+                        'voice_profiles_count': voice_profiles_created
+                    }).eq('id', file_record_id).execute()
+                    
                 except Exception as e:
                     logger.error(f"❌ Voice profile generation FAILED for {creator}: {str(e)}")
                     logger.error(f"Error type: {type(e).__name__}")
                     import traceback
                     logger.error(f"Traceback: {traceback.format_exc()}")
-        
-        # 9. Update file status with detailed stats - FIXED: removed 'error' field
-        supabase.table('uploaded_files').update({
-            'status': 'completed',
-            'total_posts': len(inserted_ids),
-            'duplicate_posts': existing_count,
-            'new_posts': len(inserted_ids)
-        }).eq('id', file_record_id).execute()
+                    
+                    # UPDATE STATUS: Voice profile failed
+                    supabase.table('uploaded_files').update({
+                        'status': 'voice_profile_failed'
+                    }).eq('id', file_record_id).execute()
         
         elapsed = time.time() - start_time
         logger.info(f"✓ Processed {filename} in {elapsed:.2f} seconds")
         logger.info(f"  - New posts: {len(inserted_ids)}")
         logger.info(f"  - Duplicates skipped: {existing_count}")
+        logger.info(f"  - Voice profiles created: {voice_profiles_created}")
         
         return len(inserted_ids)
         
     except Exception as e:
         logger.error(f"Error processing file: {e}")
-        # FIXED: Only update 'status' field, not 'error'
+        # UPDATE STATUS: Failed
         supabase.table('uploaded_files').update({
             'status': 'failed'
         }).eq('id', file_record_id).execute()
@@ -594,7 +603,7 @@ async def get_processing_status(file_id: str):
     """Check the status of file processing"""
     try:
         response = supabase.table('uploaded_files') \
-            .select('status, total_posts, filename') \
+            .select('status, total_posts, filename, new_posts, duplicate_posts, voice_profiles_count') \
             .eq('id', file_id) \
             .execute()
         
