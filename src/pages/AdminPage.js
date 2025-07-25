@@ -66,21 +66,21 @@ function AdminPage({ onNavigate }) {
               case 'posts_saved':
                 setUploadStatus({
                   stage: 'posts_saved',
-                  message: `✅ Stage 1 Complete: ${statusData.total_posts} posts uploaded to database\n⏳ Stage 2: Generating voice profiles...`,
-                  posts: statusData.total_posts,
-                  newPosts: statusData.new_posts,
-                  duplicates: statusData.duplicate_posts
+                  message: `✅ Stage 1 Complete: ${statusData.total_posts || 0} posts uploaded to database\n⏳ Stage 2: Generating voice profiles...`,
+                  posts: statusData.total_posts || 0,
+                  newPosts: statusData.new_posts || 0,
+                  duplicates: statusData.duplicate_posts || 0
                 });
                 return false; // Keep polling
                 
               case 'completed':
                 setUploadStatus({
                   stage: 'completed',
-                  message: `✅ Stage 1 Complete: ${statusData.total_posts} posts uploaded to database\n✅ Stage 2 Complete: Voice profiles created\n🎉 File processing complete!`,
-                  posts: statusData.total_posts,
-                  newPosts: statusData.new_posts,
-                  duplicates: statusData.duplicate_posts,
-                  voiceProfiles: statusData.voice_profiles_count
+                  message: `✅ Stage 1 Complete: ${statusData.total_posts || 0} posts uploaded to database\n✅ Stage 2 Complete: Voice profiles created\n🎉 File processing complete!`,
+                  posts: statusData.total_posts || 0,
+                  newPosts: statusData.new_posts || 0,
+                  duplicates: statusData.duplicate_posts || 0,
+                  voiceProfiles: statusData.voice_profiles_count || 0
                 });
                 fetchStats(); // Refresh stats
                 return true; // Stop polling
@@ -88,17 +88,18 @@ function AdminPage({ onNavigate }) {
               case 'voice_profile_failed':
                 setUploadStatus({
                   stage: 'partial_success',
-                  message: `✅ Stage 1 Complete: ${statusData.total_posts} posts uploaded to database\n❌ Stage 2 Failed: Voice profile generation error`,
-                  posts: statusData.total_posts,
-                  newPosts: statusData.new_posts,
-                  duplicates: statusData.duplicate_posts
+                  message: `✅ Stage 1 Complete: ${statusData.total_posts || 0} posts uploaded to database\n❌ Stage 2 Failed: Voice profile generation error`,
+                  posts: statusData.total_posts || 0,
+                  newPosts: statusData.new_posts || 0,
+                  duplicates: statusData.duplicate_posts || 0
                 });
                 return true; // Stop polling
                 
               case 'failed':
                 setUploadStatus({
                   stage: 'failed',
-                  message: `❌ Processing failed for ${file.name}`
+                  message: `❌ Processing failed for ${file.name}`,
+                  error: statusData.error_message || 'Unknown error'
                 });
                 return true; // Stop polling
                 
@@ -132,10 +133,12 @@ function AdminPage({ onNavigate }) {
         setTimeout(() => {
           clearInterval(interval);
           setIsUploading(false);
-          setUploadStatus(prev => ({
-            ...prev,
-            message: prev.message + '\n⚠️ Processing is taking longer than expected. Check back later.'
-          }));
+          if (uploadStatus) {
+            setUploadStatus(prev => ({
+              ...prev,
+              message: (prev?.message || '') + '\n⚠️ Processing is taking longer than expected. Check back later.'
+            }));
+          }
         }, 120000);
         
       } else {
@@ -273,7 +276,7 @@ function AdminPage({ onNavigate }) {
               border: uploadStatus.stage === 'failed' ? '1px solid #fecaca' : '1px solid #e5e7eb',
               whiteSpace: 'pre-line'
             }}>
-              {uploadStatus.message}
+              {uploadStatus.message || ''}
               
               {/* Show additional details if available */}
               {uploadStatus.newPosts !== undefined && uploadStatus.duplicates !== undefined && (
