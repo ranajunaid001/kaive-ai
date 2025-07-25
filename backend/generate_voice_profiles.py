@@ -405,10 +405,15 @@ class FastVoiceProfileGenerator:
             
             # 6. GENERATE AI DESCRIPTIONS - In parallel
             loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            ai_descriptions = loop.run_until_complete(
-                self.generate_ai_descriptions_batch(ai_tasks)
-            )
+            # Replace with synchronous version:
+            ai_descriptions = {}
+            for cluster_id, (creator, posts, total_posts) in ai_tasks.items():
+                try:
+                    name, description = self._generate_single_description_sync(creator, cluster_id, posts, total_posts)
+                    ai_descriptions[cluster_id] = (name, description)
+                except Exception as e:
+                    logger.warning(f"AI generation failed for cluster {cluster_id}: {e}")
+                    ai_descriptions[cluster_id] = (f"Cluster {cluster_id}", f"Posts in cluster {cluster_id}")
             loop.close()
             
             # 7. BUILD ALL PROFILES
