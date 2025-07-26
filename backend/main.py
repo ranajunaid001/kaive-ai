@@ -124,7 +124,7 @@ class OptimizedProcessor:
         return embeddings
     
     def prepare_post_data_batch(self, df: pd.DataFrame) -> Tuple[List[Dict], List[str]]:
-        """Prepare all post data efficiently - NOW WITH FLEXIBLE COLUMN SUPPORT"""
+        """Prepare all post data efficiently"""
         posts_to_insert = []
         texts_for_embedding = []
         
@@ -139,19 +139,12 @@ class OptimizedProcessor:
         # Parse dates efficiently
         valid_df['post_date'] = pd.to_datetime(valid_df['postDate'], errors='coerce').fillna(datetime.now()).dt.strftime('%Y-%m-%d')
         
-        # Handle optional timestamp column
-        if 'postTimestamp' in valid_df.columns:
-            valid_df['post_timestamp'] = pd.to_datetime(valid_df['postTimestamp'], errors='coerce').fillna(datetime.now()).apply(lambda x: x.isoformat())
-        else:
-            # Use postDate as timestamp if postTimestamp doesn't exist
-            valid_df['post_timestamp'] = pd.to_datetime(valid_df['postDate'], errors='coerce').fillna(datetime.now()).apply(lambda x: x.isoformat())
+        # Fix for timestamp - apply isoformat to each value, not to the series
+        valid_df['post_timestamp'] = pd.to_datetime(valid_df['postTimestamp'], errors='coerce').fillna(datetime.now()).apply(lambda x: x.isoformat())
         
-        # Parse numeric fields with defaults
+        # Parse numeric fields
         for col, new_col in [('likeCount', 'like_count'), ('commentCount', 'comment_count'), ('repostCount', 'repost_count')]:
-            if col in valid_df.columns:
-                valid_df[new_col] = pd.to_numeric(valid_df[col].astype(str).str.replace(',', ''), errors='coerce').fillna(0).astype(int)
-            else:
-                valid_df[new_col] = 0
+            valid_df[new_col] = pd.to_numeric(valid_df[col].astype(str).str.replace(',', ''), errors='coerce').fillna(0).astype(int)
         
         # Build post data
         for _, row in valid_df.iterrows():
@@ -165,7 +158,6 @@ class OptimizedProcessor:
                 'post_timestamp': row['post_timestamp']
             }
             
-            # Add optional fields if they exist
             if 'postUrl' in row and pd.notna(row['postUrl']):
                 post_data['post_url'] = clean_text(row['postUrl'])
             
@@ -364,28 +356,12 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         else:
             df = pd.read_excel(io.BytesIO(contents))
         
-        # 2. Validate ONLY ESSENTIAL columns
-        required_columns = ['postContent', 'author', 'postDate']
-        missing_columns = [col for col in required_columns if col not in df.columns]
-        
-        if missing_columns:
-            raise ValueError(f"Missing required columns: {missing_columns}")
-        
-        # Add default values for missing expected columns
-        default_columns = {
-            'likeCount': 0,
-            'commentCount': 0,
-            'repostCount': 0,
-            'postTimestamp': datetime.now().isoformat()
-        }
-        
-        for col, default_value in default_columns.items():
-            if col not in df.columns:
-                df[col] = default_value
-                logger.info(f"Added default column {col} with value {default_value}")
+        # 2. Validate columns
+        required_columns = ['postContent', 'author', 'likeCount', 'commentCount', 'repostCount', 'postDate', 'postTimestamp']
+        if not all(col in df.columns for col in required_columns):
+            raise ValueError(f"Missing required columns")
         
         logger.info(f"Processing {len(df)} rows from {filename}")
-        logger.info(f"Available columns: {list(df.columns)}")
         
         # 3. Prepare all data at once
         posts_to_insert, texts_for_embedding = processor.prepare_post_data_batch(df)
