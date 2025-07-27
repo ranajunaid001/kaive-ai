@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
 import AppPage from './pages/AppPage';
+import CreatorsPage from './pages/CreatorsPage';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -19,11 +20,14 @@ function AppContent() {
       case 'login':
         navigate('/login');
         break;
+      case 'creators':
+        navigate('/creators');
+        break;
       default:
         navigate('/');
     }
   };
-
+  
   // Check if we're on the app subdomain
   const isAppSubdomain = window.location.hostname === 'app.kaive.xyz';
   
@@ -43,6 +47,7 @@ function AppContent() {
       <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<AdminPage onNavigate={handleNavigate} />} />
+      <Route path="/creators" element={<CreatorsPage onNavigate={handleNavigate} />} />
       <Route path="/app" element={<AppPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
