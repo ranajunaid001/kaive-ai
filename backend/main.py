@@ -826,7 +826,7 @@ async def get_all_creators_fast():
     """Ultra-fast endpoint for creators listing - uses database function"""
     try:
         # Call the Supabase function we just created
-        response = supabase.rpc('get_creators_with_stats').execute()
+        response = supabase.rpc('get_creators_with_stats', {}).execute()
         
         # Transform the data to match your frontend expectations
         creators_list = []
