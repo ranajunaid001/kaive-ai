@@ -161,6 +161,10 @@ class OptimizedProcessor:
             if 'postUrl' in row and pd.notna(row['postUrl']):
                 post_data['post_url'] = clean_text(row['postUrl'])
             
+            # Handle imgUrl column
+            if 'imgUrl' in row and pd.notna(row['imgUrl']):
+                post_data['imgUrl'] = clean_text(row['imgUrl'])
+            
             posts_to_insert.append(post_data)
             texts_for_embedding.append(row['clean_content'])
         
@@ -360,6 +364,10 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         required_columns = ['postContent', 'author', 'likeCount', 'commentCount', 'repostCount', 'postDate', 'postTimestamp']
         if not all(col in df.columns for col in required_columns):
             raise ValueError(f"Missing required columns")
+        
+        # Log if imgUrl column is present
+        if 'imgUrl' in df.columns:
+            logger.info(f"Found imgUrl column in {filename}")
         
         logger.info(f"Processing {len(df)} rows from {filename}")
         
