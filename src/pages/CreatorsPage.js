@@ -42,7 +42,7 @@ function CreatorsPage({ onNavigate }) {
   const fetchCreators = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://kaive-ai-production-7be5.up.railway.app/api/creators');
+      const response = await fetch('https://kaive-ai-production-7be5.up.railway.app/api/creators/fast');
       
       if (!response.ok) {
         throw new Error('Failed to fetch creators');
