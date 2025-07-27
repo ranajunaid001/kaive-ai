@@ -754,6 +754,71 @@ async def fix_all_stuck_files():
         logger.error(f"Fix all failed: {e}")
         raise HTTPException(500, str(e))
 
+# NEW ENDPOINT - GET ALL CREATORS
+@app.get("/api/creators")
+async def get_all_creators():
+    """Get all creators with their stats"""
+    try:
+        # Get all creators from creators table
+        creators_response = supabase.table('creators') \
+            .select('*') \
+            .execute()
+        
+        creators_list = []
+        
+        for creator in creators_response.data:
+            # Get post stats for each creator
+            posts_response = supabase.table('creator_posts') \
+                .select('id, like_count, comment_count, repost_count') \
+                .eq('author', creator['author']) \
+                .execute()
+            
+            post_count = len(posts_response.data)
+            
+            # Calculate average engagement
+            total_likes = sum(p.get('like_count', 0) for p in posts_response.data)
+            total_comments = sum(p.get('comment_count', 0) for p in posts_response.data)
+            total_reposts = sum(p.get('repost_count', 0) for p in posts_response.data)
+            
+            avg_engagement = 0
+            if post_count > 0:
+                avg_engagement = round((total_likes + total_comments + total_reposts) / post_count)
+            
+            # Get voice profiles count
+            voice_profiles_response = supabase.table('creator_voice_profiles') \
+                .select('cluster_id', count='exact') \
+                .eq('creator', creator['author']) \
+                .execute()
+            
+            creator_data = {
+                'id': creator['id'],
+                'author': creator['author'],
+                'headline': creator.get('headline', ''),
+                'location': creator.get('location', ''),
+                'avatar_url': creator.get('avatar_url', ''),
+                'linkedin_url': creator.get('linkedin_url', ''),
+                'post_count': post_count,
+                'avg_likes': round(total_likes / post_count) if post_count > 0 else 0,
+                'avg_engagement': avg_engagement,
+                'voice_profiles_count': voice_profiles_response.count,
+                'created_at': creator.get('created_at', '')
+            }
+            
+            creators_list.append(creator_data)
+        
+        # Sort by post count (most active creators first)
+        creators_list.sort(key=lambda x: x['post_count'], reverse=True)
+        
+        return {
+            "success": True,
+            "data": creators_list,
+            "total": len(creators_list)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching creators: {e}")
+        raise HTTPException(500, f"Error fetching creators: {str(e)}")
+
 # Cleanup on shutdown
 @app.on_event("shutdown")
 def shutdown_event():
