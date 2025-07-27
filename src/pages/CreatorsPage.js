@@ -60,10 +60,8 @@ function CreatorsPage({ onNavigate }) {
   };
 
   const handleCreatorClick = (creator) => {
-    // Navigate to individual creator page
-    // You can implement this based on your routing setup
-    console.log('Navigate to creator:', creator.author);
-    // onNavigate(`creator/${encodeURIComponent(creator.author)}`);
+  // Navigate to individual creator page
+  window.location.href = `/creators/${encodeURIComponent(creator.author)}`;
   };
 
   const formatNumber = (num) => {
