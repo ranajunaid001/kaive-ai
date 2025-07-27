@@ -215,3 +215,145 @@ function CreatorProfilePage({ onNavigate }) {
                 View LinkedIn Profile
               </button>
             )}
+          </div>
+        </aside>
+
+        {/* Posts Section */}
+        <main className={styles.postsSection}>
+          <div className={styles.postsHeader}>
+            <h2>Recent Posts</h2>
+            <span className={styles.postCount}>{posts.length} posts</span>
+          </div>
+
+          {posts.length === 0 ? (
+            <div className={styles.noPosts}>
+              <p>No posts available for this creator.</p>
+            </div>
+          ) : (
+            <div className={styles.postsGrid}>
+              {posts.map((post) => (
+                <div key={post.id} className={styles.postCard}>
+                  <div className={styles.postHeader}>
+                    <div className={styles.postAuthorAvatar}>
+                      {creator.avatar_url ? (
+                        <img src={creator.avatar_url} alt={creator.author} />
+                      ) : (
+                        <div className={styles.avatarPlaceholder}>
+                          {creator.author.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.postAuthorInfo}>
+                      <div className={styles.postAuthorName}>{creator.author}</div>
+                      <div className={styles.postDate}>{formatDate(post.post_date)}</div>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.postContent}>
+                    <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}>
+                      {post.post_content}
+                    </p>
+                    {post.post_content.length > 280 && (
+                      <button 
+                        className={styles.moreButton}
+                        onClick={() => togglePostExpansion(post.id)}
+                      >
+                        {expandedPosts[post.id] ? '...less' : '...more'}
+                      </button>
+                    )}
+                  </div>
+
+                  {post.imgUrl && (
+                    <div className={styles.postImage}>
+                      <img src={post.imgUrl} alt="Post media" />
+                    </div>
+                  )}
+
+                  {!post.imgUrl && post.media_type === 'video' && (
+                    <div className={styles.postVideo}>
+                      <div className={styles.playButton}>
+                        <div className={styles.playIcon}></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={styles.socialCounts}>
+                    <div className={styles.reactions}>
+                      <div className={styles.reactionIcons}>
+                        <img className={styles.reactionIcon} 
+                             src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" 
+                             alt="like" />
+                        <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                             src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds6e" 
+                             alt="heart" />
+                        {post.like_count > 1000 && (
+                          <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                               src="https://static.licdn.com/aero-v1/sc/h/b1dl5jk88euc7e9ri50xy5qo8" 
+                               alt="celebrate" />
+                        )}
+                      </div>
+                      <span className={styles.reactionCount}>
+                        {formatNumber(post.like_count)}
+                      </span>
+                    </div>
+                    
+                    <div className={styles.countItems}>
+                      <span>{formatNumber(post.comment_count)} comments</span>
+                      <span className={styles.dot}>•</span>
+                      <span>{formatNumber(post.repost_count)} reposts</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.postActions}>
+                    <div className={styles.actionButtons}>
+                      <button 
+                        className={styles.actionButton}
+                        onClick={() => handleViewPost(post.post_url)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        View
+                      </button>
+                      <button 
+                        className={styles.actionButton}
+                        onClick={() => handleCopyPost(post.post_content)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                        Copy
+                      </button>
+                      <button 
+                        className={styles.actionButton}
+                        onClick={() => handleSavePost(post.id)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                        </svg>
+                        Save
+                      </button>
+                    </div>
+                    <button 
+                      className={styles.actionButton}
+                      onClick={() => handleRepurposePost(post.id)}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                      </svg>
+                      Repurpose
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default CreatorProfilePage;
