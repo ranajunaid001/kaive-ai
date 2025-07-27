@@ -5,6 +5,7 @@ import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
 import AppPage from './pages/AppPage';
 import CreatorsPage from './pages/CreatorsPage';
+import CreatorProfilePage from './pages/CreatorProfilePage';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ function AppContent() {
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<AdminPage onNavigate={handleNavigate} />} />
       <Route path="/creators" element={<CreatorsPage onNavigate={handleNavigate} />} />
+      <Route path="/creators/:creatorName" element={<CreatorProfilePage onNavigate={handleNavigate} />} />
       <Route path="/app" element={<AppPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
