@@ -501,129 +501,138 @@
   margin-left: 4px;
 }
 
-/* Social Counts */
-.socialCounts {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.reactions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.reactionIcons {
-  display: flex;
-  align-items: center;
-}
-
-.reactionIcon {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-
-.reactionIcon.stacked {
-  margin-left: -8px;
-}
-
-.reactionCount {
-  font-weight: 500;
-  color: #374151;
-}
-
-.countItems {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dot {
-  color: #d1d5db;
-}
-
-/* Post Actions */
-.postActions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.actionButtons {
-  display: flex;
-  gap: 6px;
-}
-
-.actionButton {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #4b5563;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.actionButton:hover {
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-.actionButton svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .creatorProfile {
-    width: 320px;
+  /* Social Counts */
+  .socialCounts {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+    color: #6b7280;
   }
   
-  .profileCard {
-    padding: 24px;
-  }
-}
-
-@media (max-width: 968px) {
-  .postsGrid {
-    column-count: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .mainContainer {
-    flex-direction: column;
-    padding: 80px 20px 20px;
-  }
-
-  .creatorProfile {
-    position: relative;
-    top: 0;
-    width: 100%;
-    margin-bottom: 24px;
+  .reactions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   
-  .navContent {
-    padding: 0 20px;
+  .reactionIcons {
+    display: flex;
+    align-items: center;
   }
   
-  .postsHeader h2 {
-    font-size: 24px;
+  .reactionIcon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    display: block;
+    object-fit: cover;
   }
-}
+  
+  .reactionIcon.stacked {
+    margin-left: -8px;
+  }
+  
+  .reactionCount {
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .countItems {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .dot {
+    color: #d1d5db;
+  }
+  
+  /* Post Actions */
+  .postActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  
+  .actionButtons {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .actionButton {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .actionButton:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+  
+  .actionButton svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  
+  /* Repurpose button - align right */
+  .actionButton:last-child {
+    margin-left: auto;
+  }
+  
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .creatorProfile {
+      width: 320px;
+    }
+    
+    .profileCard {
+      padding: 24px;
+    }
+  }
+  
+  @media (max-width: 968px) {
+    .postsGrid {
+      column-count: 1;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .mainContainer {
+      flex-direction: column;
+      padding: 80px 20px 20px;
+    }
+  
+    .creatorProfile {
+      position: relative;
+      top: 0;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    
+    .navContent {
+      padding: 0 20px;
+    }
+    
+    .postsHeader h2 {
+      font-size: 24px;
+    }
+  }
