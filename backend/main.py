@@ -857,6 +857,68 @@ async def get_all_creators_fast():
         raise HTTPException(500, f"Error fetching creators: {str(e)}")
 
 
+@app.get("/api/creators/{author_name}")
+async def get_creator_details(author_name: str):
+    """Get detailed information for a specific creator"""
+    try:
+        # Get creator info
+        creator_response = supabase.table('creators') \
+            .select('*') \
+            .eq('author', author_name) \
+            .single() \
+            .execute()
+        
+        if not creator_response.data:
+            raise HTTPException(404, "Creator not found")
+        
+        creator = creator_response.data
+        
+        # Get aggregated stats using our function
+        stats_response = supabase.rpc('get_creators_with_stats', {}).execute()
+        
+        # Find this creator's stats
+        creator_stats = next((s for s in stats_response.data if s['creator_name'] == author_name), None)
+        
+        if creator_stats:
+            creator.update({
+                'post_count': creator_stats['total_posts'],
+                'avg_likes': creator_stats['average_likes'],
+                'avg_engagement': creator_stats['average_engagement'],
+                'voice_profiles_count': creator_stats['total_voice_profiles']
+            })
+        
+        return {
+            "success": True,
+            "data": creator
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching creator details: {e}")
+        raise HTTPException(500, str(e))
+
+@app.get("/api/creators/{author_name}/posts")
+async def get_creator_posts(author_name: str, limit: int = 50, offset: int = 0):
+    """Get posts for a specific creator"""
+    try:
+        # Get posts with engagement metrics
+        posts_response = supabase.table('creator_posts') \
+            .select('*') \
+            .eq('author', author_name) \
+            .order('post_timestamp', desc=True) \
+            .range(offset, offset + limit - 1) \
+            .execute()
+        
+        return {
+            "success": True,
+            "data": posts_response.data,
+            "total": len(posts_response.data)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching creator posts: {e}")
+        raise HTTPException(500, str(e))
+
+
 # Cleanup on shutdown
 @app.on_event("shutdown")
 def shutdown_event():
