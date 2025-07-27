@@ -11,44 +11,44 @@ function CreatorProfilePage({ onNavigate }) {
   const [expandedPosts, setExpandedPosts] = useState({});
 
   useEffect(() => {
+    const fetchCreatorData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch creator details
+        const creatorResponse = await fetch(
+          `https://kaive-ai-production-7be5.up.railway.app/api/creators/${encodeURIComponent(creatorName)}`
+        );
+        
+        if (!creatorResponse.ok) {
+          throw new Error('Creator not found');
+        }
+        
+        const creatorData = await creatorResponse.json();
+        setCreator(creatorData.data);
+        
+        // Fetch creator posts
+        const postsResponse = await fetch(
+          `https://kaive-ai-production-7be5.up.railway.app/api/creators/${encodeURIComponent(creatorName)}/posts`
+        );
+        
+        if (postsResponse.ok) {
+          const postsData = await postsResponse.json();
+          setPosts(postsData.data || []);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching creator data:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (creatorName) {
       fetchCreatorData();
     }
   }, [creatorName]);
-
-  const fetchCreatorData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch creator details
-      const creatorResponse = await fetch(
-        `https://kaive-ai-production-7be5.up.railway.app/api/creators/${encodeURIComponent(creatorName)}`
-      );
-      
-      if (!creatorResponse.ok) {
-        throw new Error('Creator not found');
-      }
-      
-      const creatorData = await creatorResponse.json();
-      setCreator(creatorData.data);
-      
-      // Fetch creator posts
-      const postsResponse = await fetch(
-        `https://kaive-ai-production-7be5.up.railway.app/api/creators/${encodeURIComponent(creatorName)}/posts`
-      );
-      
-      if (postsResponse.ok) {
-        const postsData = await postsResponse.json();
-        setPosts(postsData.data || []);
-      }
-      
-    } catch (error) {
-      console.error('Error fetching creator data:', error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatNumber = (num) => {
     if (!num) return '0';
