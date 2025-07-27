@@ -62,19 +62,22 @@ function CreatorProfilePage({ onNavigate }) {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const year = date.getFullYear();
     
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
+    // Add ordinal suffix to day
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return 'th';
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
     
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
+    return `${day}${getOrdinalSuffix(day)} ${month}, ${year}`;
   };
 
   const togglePostExpansion = (postId) => {
@@ -88,6 +91,32 @@ function CreatorProfilePage({ onNavigate }) {
     if (creator?.linkedin_url) {
       window.open(creator.linkedin_url, '_blank');
     }
+  };
+
+  const handleViewPost = (postUrl) => {
+    if (postUrl) {
+      window.open(postUrl, '_blank');
+    }
+  };
+
+  const handleCopyPost = async (postContent) => {
+    try {
+      await navigator.clipboard.writeText(postContent);
+      // You can add a toast notification here if you have one
+      console.log('Post copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleSavePost = (postId) => {
+    // TODO: Implement save functionality
+    console.log('Save post:', postId);
+  };
+
+  const handleRepurposePost = (postId) => {
+    // TODO: Implement repurpose functionality
+    console.log('Repurpose post:', postId);
   };
 
   if (loading) {
@@ -159,15 +188,6 @@ function CreatorProfilePage({ onNavigate }) {
                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <span>{creator.location}</span>
-                </div>
-              )}
-              {creator.voice_profiles_count > 0 && (
-                <div className={styles.metaItem}>
-                  <svg className={styles.metaIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  <span>{creator.voice_profiles_count} Voice Profiles</span>
                 </div>
               )}
             </div>
@@ -243,13 +263,13 @@ function CreatorProfilePage({ onNavigate }) {
                     )}
                   </div>
 
-                  {post.media_type === 'image' && post.media_url && (
+                  {post.imgUrl && (
                     <div className={styles.postImage}>
-                      <img src={post.media_url} alt="Post media" />
+                      <img src={post.imgUrl} alt="Post media" />
                     </div>
                   )}
 
-                  {post.media_type === 'video' && (
+                  {!post.imgUrl && post.media_type === 'video' && (
                     <div className={styles.postVideo}>
                       <div className={styles.playButton}>
                         <div className={styles.playIcon}></div>
@@ -263,15 +283,13 @@ function CreatorProfilePage({ onNavigate }) {
                         <img className={styles.reactionIcon} 
                              src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" 
                              alt="like" />
+                        <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                             src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds6e" 
+                             alt="heart" />
                         {post.like_count > 1000 && (
                           <img className={`${styles.reactionIcon} ${styles.stacked}`}
                                src="https://static.licdn.com/aero-v1/sc/h/b1dl5jk88euc7e9ri50xy5qo8" 
                                alt="celebrate" />
-                        )}
-                        {post.like_count > 5000 && (
-                          <img className={`${styles.reactionIcon} ${styles.stacked}`}
-                               src="https://static.licdn.com/aero-v1/sc/h/lhxmwiwoag9qepsh4nc28zus" 
-                               alt="insightful" />
                         )}
                       </div>
                       <span className={styles.reactionCount}>
@@ -284,6 +302,49 @@ function CreatorProfilePage({ onNavigate }) {
                       <span className={styles.dot}>•</span>
                       <span>{formatNumber(post.repost_count)} reposts</span>
                     </div>
+                  </div>
+
+                  <div className={styles.postActions}>
+                    <div className={styles.actionButtons}>
+                      <button 
+                        className={styles.actionButton}
+                        onClick={() => handleViewPost(post.post_url)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        View
+                      </button>
+                      <button 
+                        className={styles.actionButton}
+                        onClick={() => handleCopyPost(post.post_content)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                        </svg>
+                        Copy
+                      </button>
+                      <button 
+                        className={styles.actionButton}
+                        onClick={() => handleSavePost(post.id)}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                        </svg>
+                        Save
+                      </button>
+                    </div>
+                    <button 
+                      className={styles.actionButton}
+                      onClick={() => handleRepurposePost(post.id)}
+                    >
+                      <svg viewBox="0 0 256 256" fill="currentColor">
+                        <path d="M48,64a8,8,0,0,1,8-8H72V40a8,8,0,0,1,16,0V56h16a8,8,0,0,1,0,16H88V88a8,8,0,0,1-16,0V72H56A8,8,0,0,1,48,64ZM184,192h-8v-8a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0v-8h8a8,8,0,0,0,0-16Zm56-48H224V128a8,8,0,0,0-16,0v16H192a8,8,0,0,0,0,16h16v16a8,8,0,0,0,16,0V160h16a8,8,0,0,0,0-16ZM219.31,80,80,219.31a16,16,0,0,1-22.62,0L36.68,198.63a16,16,0,0,1,0-22.63L176,36.69a16,16,0,0,1,22.63,0l20.68,20.68A16,16,0,0,1,219.31,80Zm-54.63,32L144,91.31l-96,96L68.68,208ZM208,68.69,187.31,48l-32,32L176,100.69Z"/>
+                      </svg>
+                      Repurpose
+                    </button>
                   </div>
                 </div>
               ))}
