@@ -819,6 +819,44 @@ async def get_all_creators():
         logger.error(f"Error fetching creators: {e}")
         raise HTTPException(500, f"Error fetching creators: {str(e)}")
 
+# ADD THE NEW FAST ENDPOINT HERE ↓↓↓
+
+@app.get("/api/creators/fast")
+async def get_all_creators_fast():
+    """Ultra-fast endpoint for creators listing - uses database function"""
+    try:
+        # Call the Supabase function we just created
+        response = supabase.rpc('get_creators_with_stats').execute()
+        
+        # Transform the data to match your frontend expectations
+        creators_list = []
+        for row in response.data:
+            creator_data = {
+                'id': row['creator_id'],
+                'author': row['creator_name'],
+                'headline': row['creator_headline'],
+                'location': row['creator_location'],
+                'avatar_url': row['creator_avatar_url'],
+                'linkedin_url': row['creator_linkedin_url'],
+                'created_at': row['creator_created_at'],
+                'post_count': row['total_posts'],
+                'avg_likes': row['average_likes'],
+                'avg_engagement': row['average_engagement'],
+                'voice_profiles_count': row['total_voice_profiles']
+            }
+            creators_list.append(creator_data)
+        
+        return {
+            "success": True,
+            "data": creators_list,
+            "total": len(creators_list)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching creators fast: {e}")
+        raise HTTPException(500, f"Error fetching creators: {str(e)}")
+
+
 # Cleanup on shutdown
 @app.on_event("shutdown")
 def shutdown_event():
