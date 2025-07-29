@@ -304,39 +304,9 @@ function CreatorProfilePage({ onNavigate }) {
                       <span>{formatNumber(post.repost_count)} reposts</span>
                     </div>
                   </div>
-
-  <div className={styles.postActions}>
-                      <div className={styles.actionButtons}>
-                        <button 
-                          className={styles.actionButton}
-                          onClick={() => handleViewPost(post.post_url)}
-                        >
-                          <Eye size={16} />
-                          View
-                        </button>
-                        <button 
-                          className={styles.actionButton}
-                          onClick={() => handleCopyPost(post.post_content)}
-                        >
-                          <Copy size={16} />
-                          Copy
-                        </button>
-                        <button 
-                          className={styles.actionButton}
-                          onClick={() => handleSavePost(post.id)}
-                        >
-                          <Bookmark size={16} />
-                          Save
-                        </button>
-                      </div>
-                      <button 
-                        className={styles.actionButton}
-                        onClick={() => handleRepurposePost(post.id)}
-                      >
-                        <RefreshCw size={16} />
-                        Repurpose
-                      </button>
-                    </div>
+                                 
+{/* Action buttons removed temporarily */}
+                                 
                 </div>
               ))}
             </div>
