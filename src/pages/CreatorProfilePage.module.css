@@ -145,6 +145,7 @@
   padding: 88px 40px 40px;
   gap: 32px;
   position: relative;
+  align-items: flex-start; /* Ensure proper alignment */
 }
 
 /* Creator Profile Card - Fixed Left */
@@ -153,6 +154,8 @@
   top: 88px;
   height: fit-content;
   width: 380px;
+  min-width: 380px; /* Prevent shrinking */
+  max-width: 380px; /* Prevent growing */
   flex-shrink: 0;
 }
 
@@ -304,6 +307,7 @@
 .postsSection {
   flex: 1;
   min-width: 0;
+  max-width: calc(100% - 412px); /* Account for profile width + gap */
 }
 
 .postsHeader {
@@ -333,6 +337,7 @@
   -webkit-column-gap: 16px;
   -moz-column-gap: 16px;
   column-gap: 16px;
+  width: 100%; /* Ensure grid takes full width of container */
 }
 
 /* Post Card - Masonry Layout */
@@ -557,6 +562,12 @@
 @media (max-width: 1200px) {
   .creatorProfile {
     width: 320px;
+    min-width: 320px;
+    max-width: 320px;
+  }
+  
+  .postsSection {
+    max-width: calc(100% - 352px); /* Adjusted for smaller profile width */
   }
   
   .profileCard {
@@ -582,7 +593,13 @@
     position: relative;
     top: 0;
     width: 100%;
+    min-width: unset;
+    max-width: unset;
     margin-bottom: 24px;
+  }
+  
+  .postsSection {
+    max-width: 100%;
   }
   
   .navContent {
