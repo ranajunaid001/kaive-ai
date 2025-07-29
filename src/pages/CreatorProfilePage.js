@@ -284,12 +284,12 @@ function CreatorProfilePage({ onNavigate }) {
                              src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" 
                              alt="like" />
                         <img className={`${styles.reactionIcon} ${styles.stacked}`}
-                             src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds6e" 
-                             alt="heart" />
+                             src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds22" 
+                             alt="love" />
                         {post.like_count > 1000 && (
                           <img className={`${styles.reactionIcon} ${styles.stacked}`}
-                               src="https://static.licdn.com/aero-v1/sc/h/b1dl5jk88euc7e9ri50xy5qo8" 
-                               alt="celebrate" />
+                               src="https://static.licdn.com/aero-v1/sc/h/lhxmwiwoag9qepsh4nc28zus" 
+                               alt="insightful" />
                         )}
                       </div>
                       <span className={styles.reactionCount}>
@@ -310,7 +310,7 @@ function CreatorProfilePage({ onNavigate }) {
                         className={styles.actionButton}
                         onClick={() => handleViewPost(post.post_url)}
                       >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                           <circle cx="12" cy="12" r="3"/>
                         </svg>
@@ -320,7 +320,7 @@ function CreatorProfilePage({ onNavigate }) {
                         className={styles.actionButton}
                         onClick={() => handleCopyPost(post.post_content)}
                       >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                           <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                         </svg>
@@ -330,7 +330,7 @@ function CreatorProfilePage({ onNavigate }) {
                         className={styles.actionButton}
                         onClick={() => handleSavePost(post.id)}
                       >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
                         </svg>
                         Save
@@ -340,8 +340,10 @@ function CreatorProfilePage({ onNavigate }) {
                       className={styles.actionButton}
                       onClick={() => handleRepurposePost(post.id)}
                     >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="1 4 1 10 7 10"/>
+                        <polyline points="23 20 23 14 17 14"/>
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
                       </svg>
                       Repurpose
                     </button>
