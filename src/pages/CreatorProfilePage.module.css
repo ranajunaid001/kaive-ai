@@ -325,14 +325,15 @@
   font-size: 16px;
 }
 
-/* Posts Masonry Grid - THE KEY CHANGE */
+/* Posts Grid - Using Flexbox Masonry Alternative */
 .postsGrid {
-  column-count: 2;
-  column-gap: 16px;
-  column-fill: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
 }
 
-/* Post Card - Masonry Item */
+/* Post Card - Half width for 2 columns */
 .postCard {
   background: white;
   border-radius: 12px;
@@ -341,16 +342,8 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  
-  /* Critical masonry properties */
-  break-inside: avoid;
-  page-break-inside: avoid;
-  column-break-inside: avoid;
-  display: inline-block;
-  width: 100%;
-  margin: 0 0 16px 0;
-  vertical-align: top;
-  transform-origin: top center;
+  width: calc(50% - 8px);
+  margin-bottom: 0;
 }
 
 .postCard:hover {
@@ -565,7 +558,11 @@
 
 @media (max-width: 968px) {
   .postsGrid {
-    column-count: 1;
+    flex-direction: column;
+  }
+  
+  .postCard {
+    width: 100%;
   }
 }
 
