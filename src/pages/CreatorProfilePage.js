@@ -248,7 +248,7 @@ function CreatorProfilePage({ onNavigate }) {
                     </div>
                   )}
 
-                  {!post.imgUrl && post.media_type === 'video' && (
+                  {!post.imgurl && post.media_type === 'video' && (
                     <div className={styles.postVideo}>
                       <div className={styles.playButton}>
                         <div className={styles.playIcon}></div>
