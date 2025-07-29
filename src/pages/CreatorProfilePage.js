@@ -1,592 +1,295 @@
-/* CreatorProfilePage.module.css */
-
-.profilePage {
-  min-height: 100vh;
-  background-color: #f8f9fa;
-}
-
-/* Navigation */
-.nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  z-index: 1000;
-}
-
-.navContent {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 40px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.navLogo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.navLogo:hover {
-  opacity: 0.8;
-}
-
-.navLogoIcon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 20px;
-}
-
-.backBtn {
-  background: transparent;
-  border: 1px solid #e5e7eb;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #4b5563;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.backBtn:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-}
-
-/* Loading State */
-.loadingContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.loader {
-  width: 48px;
-  height: 48px;
-  border: 3px solid #f3f4f6;
-  border-top-color: #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Error State */
-.errorContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-  text-align: center;
-}
-
-.errorContainer h2 {
-  font-size: 28px;
-  color: #1f2937;
-  margin-bottom: 12px;
-}
-
-.errorContainer p {
-  font-size: 16px;
-  color: #6b7280;
-  margin-bottom: 24px;
-}
-
-.backButton {
-  background: #667eea;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.backButton:hover {
-  background: #5a67d8;
-  transform: translateY(-1px);
-}
-
-/* Main Layout */
-.mainContainer {
-  display: flex;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 88px 40px 40px;
-  gap: 32px;
-  position: relative;
-}
-
-/* Creator Profile Card - Fixed Left */
-.creatorProfile {
-  position: sticky;
-  top: 88px;
-  height: fit-content;
-  width: 380px;
-  flex-shrink: 0;
-}
-
-.profileCard {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.profileHeader {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.profileAvatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.profileAvatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatarPlaceholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 32px;
-  font-weight: 600;
-}
-
-.profileInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.profileName {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 4px;
-  line-height: 1.2;
-  color: #1f2937;
-}
-
-.profileTagline {
-  font-size: 14px;
-  color: #6b7280;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.profileMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.metaItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.metaIcon {
-  width: 16px;
-  height: 16px;
-  color: #9ca3af;
-  flex-shrink: 0;
-}
-
-.profileStats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding: 20px 0;
-  border-top: 1px solid #f3f4f6;
-  border-bottom: 1px solid #f3f4f6;
-  margin-bottom: 20px;
-}
-
-.statItem {
-  text-align: center;
-}
-
-.statNumber {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1f2937;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.statLabel {
-  font-size: 12px;
-  color: #6b7280;
-  text-transform: capitalize;
-}
-
-.linkedinButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 16px;
-  background: #0a66c2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.linkedinButton:hover {
-  background: #004b7c;
-  transform: translateY(-1px);
-}
-
-.linkedinButton svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Posts Section */
-.postsSection {
-  flex: 1;
-  min-width: 0;
-}
-
-.postsHeader {
-  margin-bottom: 24px;
-}
-
-.postsHeader h2 {
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: #1f2937;
-  margin: 0;
-}
-
-.noPosts {
-  text-align: center;
-  padding: 60px 20px;
-  color: #6b7280;
-  font-size: 16px;
-}
-
-/* Posts Masonry Grid - THE KEY CHANGE */
-.postsGrid {
-  column-count: 2;
-  column-gap: 16px;
-  column-fill: auto;
-}
-
-/* Post Card - Masonry Item */
-.postCard {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  
-  /* Critical masonry properties */
-  break-inside: avoid;
-  page-break-inside: avoid;
-  column-break-inside: avoid;
-  display: inline-block;
-  width: 100%;
-  margin: 0 0 16px 0;
-  vertical-align: top;
-  transform-origin: top center;
-}
-
-.postCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 10;
-  position: relative;
-}
-
-.postHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.postAuthorAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.postAuthorAvatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.postAuthorAvatar .avatarPlaceholder {
-  font-size: 16px;
-}
-
-.postAuthorInfo {
-  flex: 1;
-}
-
-.postAuthorName {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: #1f2937;
-}
-
-.postDate {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 2px;
-}
-
-.postContent {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #374151;
-  margin-bottom: 16px;
-}
-
-.postContent p {
-  margin: 0;
-}
-
-.collapsed {
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.expanded {
-  display: block;
-}
-
-.moreButton {
-  color: #667eea;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 0;
-  margin-left: 4px;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.moreButton:hover {
-  color: #5a67d8;
-  text-decoration: underline;
-}
-
-/* Image container - full content width */
-.postImageContainer {
-  margin: 0 0 16px 0;
-}
-
-.postImage {
-  width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f5f5f7;
-}
-
-/* Let image determine its own height */
-.postImage img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.postCard:hover .postImage img {
-  transform: scale(1.03);
-}
-
-.postVideo {
-  width: 100%;
-  margin: 0 0 16px 0;
-  height: 240px;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.playButton {
-  width: 60px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.playButton:hover {
-  transform: scale(1.1);
-  background: white;
-}
-
-.playIcon {
-  width: 0;
-  height: 0;
-  border-left: 18px solid #1f2937;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  margin-left: 4px;
-}
-
-/* Social Counts - No auto margin in masonry */
-.socialCounts {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.reactions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.reactionIcons {
-  display: flex;
-  align-items: center;
-}
-
-.reactionIcon {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-
-.reactionIcon.stacked {
-  margin-left: -8px;
-}
-
-.reactionCount {
-  font-weight: 500;
-  color: #374151;
-}
-
-.countItems {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dot {
-  color: #d1d5db;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .creatorProfile {
-    width: 320px;
-  }
-  
-  .profileCard {
-    padding: 24px;
-  }
-}
-
-@media (max-width: 968px) {
-  .postsGrid {
-    column-count: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .mainContainer {
-    flex-direction: column;
-    padding: 80px 20px 20px;
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import styles from './CreatorProfilePage.module.css';
+
+function CreatorProfilePage({ onNavigate }) {
+  const { creatorName } = useParams();
+  const [creator, setCreator] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedPosts, setExpandedPosts] = useState({});
+
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch creator details
+        const creatorResponse = await fetch(
+          `https://kaive-ai-production-7be5.up.railway.app/api/creators/${encodeURIComponent(creatorName)}`
+        );
+        
+        if (!creatorResponse.ok) {
+          throw new Error('Creator not found');
+        }
+        
+        const creatorData = await creatorResponse.json();
+        setCreator(creatorData.data);
+        
+        // Fetch creator posts
+        const postsResponse = await fetch(
+          `https://kaive-ai-production-7be5.up.railway.app/api/creators/${encodeURIComponent(creatorName)}/posts`
+        );
+        
+        if (postsResponse.ok) {
+          const postsData = await postsResponse.json();
+          // Sort posts by date - latest first
+          const sortedPosts = (postsData.data || []).sort((a, b) => {
+            return new Date(b.post_date) - new Date(a.post_date);
+          });
+          setPosts(sortedPosts);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching creator data:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (creatorName) {
+      fetchCreatorData();
+    }
+  }, [creatorName]);
+
+  const formatNumber = (num) => {
+    if (!num) return '0';
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+    
+    // Add ordinal suffix to day
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return 'th';
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+    
+    return `${day}${getOrdinalSuffix(day)} ${month}, ${year}`;
+  };
+
+  const togglePostExpansion = (postId) => {
+    setExpandedPosts(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const handleLinkedInClick = () => {
+    if (creator?.linkedin_url) {
+      window.open(creator.linkedin_url, '_blank');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loader}></div>
+        <p>Loading creator profile...</p>
+      </div>
+    );
   }
 
-  .creatorProfile {
-    position: relative;
-    top: 0;
-    width: 100%;
-    margin-bottom: 24px;
+  if (error || !creator) {
+    return (
+      <div className={styles.errorContainer}>
+        <h2>Creator not found</h2>
+        <p>{error || 'The creator you are looking for does not exist.'}</p>
+        <button onClick={() => onNavigate('creators')} className={styles.backButton}>
+          Back to Creators
+        </button>
+      </div>
+    );
   }
-  
-  .navContent {
-    padding: 0 20px;
-  }
-  
-  .postsHeader h2 {
-    font-size: 24px;
-  }
+
+  return (
+    <div className={styles.profilePage}>
+      {/* Navigation */}
+      <nav className={styles.nav}>
+        <div className={styles.navContent}>
+          <div className={styles.navLogo} onClick={() => onNavigate('home')}>
+            <div className={styles.navLogoIcon}>K</div>
+            <span>Kaive</span>
+          </div>
+          <button className={styles.backBtn} onClick={() => onNavigate('creators')}>
+            ← Back to Creators
+          </button>
+        </div>
+      </nav>
+
+      {/* Main Container */}
+      <div className={styles.mainContainer}>
+        {/* Creator Profile - Fixed Left */}
+        <aside className={styles.creatorProfile}>
+          <div className={styles.profileCard}>
+            <div className={styles.profileHeader}>
+              <div className={styles.profileAvatar}>
+                {creator.avatar_url ? (
+                  <img src={creator.avatar_url} alt={creator.author} />
+                ) : (
+                  <div className={styles.avatarPlaceholder}>
+                    {creator.author.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className={styles.profileInfo}>
+                <h1 className={styles.profileName}>{creator.author}</h1>
+                {creator.headline && (
+                  <p className={styles.profileTagline}>{creator.headline}</p>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.profileMeta}>
+              {creator.location && (
+                <div className={styles.metaItem}>
+                  <svg className={styles.metaIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>{creator.location}</span>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.profileStats}>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>{formatNumber(creator.followers_count || 0)}</span>
+                <span className={styles.statLabel}>Followers</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>{formatNumber(creator.post_count)}</span>
+                <span className={styles.statLabel}>Posts</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>{formatNumber(creator.avg_likes)}</span>
+                <span className={styles.statLabel}>Avg Likes</span>
+              </div>
+            </div>
+
+            {creator.linkedin_url && (
+              <button className={styles.linkedinButton} onClick={handleLinkedInClick}>
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                View LinkedIn Profile
+              </button>
+            )}
+          </div>
+        </aside>
+
+        {/* Posts Section */}
+        <main className={styles.postsSection}>
+          <div className={styles.postsHeader}>
+            <h2>Recent Posts</h2>
+          </div>
+
+          {posts.length === 0 ? (
+            <div className={styles.noPosts}>
+              <p>No posts available for this creator.</p>
+            </div>
+          ) : (
+            <div className={styles.postsGrid}>
+              {posts.map((post) => (
+                <div key={post.id} className={styles.postCard}>
+                  <div className={styles.postHeader}>
+                    <div className={styles.postAuthorAvatar}>
+                      {creator.avatar_url ? (
+                        <img src={creator.avatar_url} alt={creator.author} />
+                      ) : (
+                        <div className={styles.avatarPlaceholder}>
+                          {creator.author.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.postAuthorInfo}>
+                      <div className={styles.postAuthorName}>{creator.author}</div>
+                      <div className={styles.postDate}>{formatDate(post.post_date)}</div>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.postContent}>
+                    <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}>
+                      {post.post_content}
+                    </p>
+                    {post.post_content.length > 280 && (
+                      <button 
+                        className={styles.moreButton}
+                        onClick={() => togglePostExpansion(post.id)}
+                      >
+                        {expandedPosts[post.id] ? '...less' : '...more'}
+                      </button>
+                    )}
+                  </div>
+
+                  {post.imgurl && (
+                    <div className={styles.postImageContainer}>
+                      <div className={styles.postImage}>
+                        <img src={post.imgurl} alt="Post media" />
+                      </div>
+                    </div>
+                  )}
+
+                  {!post.imgurl && post.media_type === 'video' && (
+                    <div className={styles.postVideo}>
+                      <div className={styles.playButton}>
+                        <div className={styles.playIcon}></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={styles.socialCounts}>
+                    <div className={styles.reactions}>
+                      <div className={styles.reactionIcons}>
+                        <img className={styles.reactionIcon} 
+                             src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" 
+                             alt="like" />
+                        <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                             src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds22" 
+                             alt="love" />
+                        <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                             src="https://static.licdn.com/aero-v1/sc/h/lhxmwiwoag9qepsh4nc28zus" 
+                             alt="insightful" />
+                      </div>
+                      <span className={styles.reactionCount}>
+                        {formatNumber(post.like_count)}
+                      </span>
+                    </div>
+                    
+                    <div className={styles.countItems}>
+                      <span>{formatNumber(post.comment_count)} comments</span>
+                      <span className={styles.dot}>•</span>
+                      <span>{formatNumber(post.repost_count)} reposts</span>
+                    </div>
+                  </div>
+
+                  {/* Action buttons removed */}
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
 }
+
+export default CreatorProfilePage;
