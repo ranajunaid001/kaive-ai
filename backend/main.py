@@ -161,9 +161,15 @@ class OptimizedProcessor:
             if 'postUrl' in row and pd.notna(row['postUrl']):
                 post_data['post_url'] = clean_text(row['postUrl'])
             
-            # Handle imgurl column
-            if 'imgurl' in row and pd.notna(row['imgurl']):
-                post_data['imgurl'] = clean_text(row['imgurl'])
+            # Handle imgUrl column - check both imgUrl and imgurl
+            img_col = None
+            if 'imgUrl' in row:
+                img_col = 'imgUrl'
+            elif 'imgurl' in row:
+                img_col = 'imgurl'
+                
+            if img_col and pd.notna(row[img_col]) and str(row[img_col]).strip():
+                post_data['imgurl'] = clean_text(str(row[img_col]))
             
             posts_to_insert.append(post_data)
             texts_for_embedding.append(row['clean_content'])
@@ -365,8 +371,10 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         if not all(col in df.columns for col in required_columns):
             raise ValueError(f"Missing required columns")
         
-        # Log if imgurl column is present
-        if 'imgurl' in df.columns:
+        # Log if imgUrl/imgurl column is present
+        if 'imgUrl' in df.columns:
+            logger.info(f"Found imgUrl column in {filename}")
+        elif 'imgurl' in df.columns:
             logger.info(f"Found imgurl column in {filename}")
         
         logger.info(f"Processing {len(df)} rows from {filename}")
@@ -410,6 +418,23 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         for i, (post, embedding) in enumerate(zip(posts_to_insert, embeddings)):
             if embedding:
                 post['embedding'] = embedding
+        
+        # 5. CRITICAL FIX: Ensure all posts have the same structure before insert
+        if posts_to_insert:
+            # Get all possible keys from all posts
+            all_keys = set()
+            for post in posts_to_insert:
+                all_keys.update(post.keys())
+            
+            logger.info(f"All unique keys found: {all_keys}")
+            
+            # Make sure every post has every key (use None for missing)
+            for post in posts_to_insert:
+                for key in all_keys:
+                    if key not in post:
+                        post[key] = None
+            
+            logger.info(f"Standardized all posts to have {len(all_keys)} keys")
         
         # 5. Batch insert all posts
         logger.info("Inserting posts to database...")
