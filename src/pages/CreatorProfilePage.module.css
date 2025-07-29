@@ -325,16 +325,14 @@
   font-size: 16px;
 }
 
-/* Posts Grid - Using CSS Grid */
+/* Posts Masonry Grid - THE KEY CHANGE */
 .postsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  grid-auto-rows: auto;
-  align-items: start;
+  column-count: 2;
+  column-gap: 16px;
+  column-fill: auto;
 }
 
-/* Post Card - Variable height */
+/* Post Card - Masonry Item */
 .postCard {
   background: white;
   border-radius: 12px;
@@ -342,16 +340,24 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
+  
+  /* Critical masonry properties */
+  break-inside: avoid;
+  page-break-inside: avoid;
+  column-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 16px 0;
+  vertical-align: top;
+  transform-origin: top center;
 }
 
 .postCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  position: relative;
 }
 
 .postHeader {
@@ -436,7 +442,7 @@
   text-decoration: underline;
 }
 
-/* Image container - no extra padding */
+/* Image container - full content width */
 .postImageContainer {
   margin: 0 0 16px 0;
 }
@@ -497,7 +503,7 @@
   margin-left: 4px;
 }
 
-/* Social Counts - Push to bottom */
+/* Social Counts - No auto margin in masonry */
 .socialCounts {
   display: flex;
   align-items: center;
@@ -506,7 +512,6 @@
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   font-size: 12px;
   color: #6b7280;
-  margin-top: auto;
 }
 
 .reactions {
@@ -560,7 +565,7 @@
 
 @media (max-width: 968px) {
   .postsGrid {
-    grid-template-columns: 1fr;
+    column-count: 1;
   }
 }
 
