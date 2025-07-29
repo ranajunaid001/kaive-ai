@@ -34,7 +34,11 @@ function CreatorProfilePage({ onNavigate }) {
         
         if (postsResponse.ok) {
           const postsData = await postsResponse.json();
-          setPosts(postsData.data || []);
+          // Sort posts by date - latest first
+          const sortedPosts = (postsData.data || []).sort((a, b) => {
+            return new Date(b.post_date) - new Date(a.post_date);
+          });
+          setPosts(sortedPosts);
         }
         
       } catch (error) {
@@ -91,21 +95,6 @@ function CreatorProfilePage({ onNavigate }) {
     if (creator?.linkedin_url) {
       window.open(creator.linkedin_url, '_blank');
     }
-  };
-
-  // Function to determine post type based on image dimensions or presence
-  const getPostType = (post) => {
-    if (!post.imgUrl) return 'text-only';
-    
-    // You might need to analyze the actual image URL or add logic based on your data
-    // For now, we'll use a simple approach
-    // This is a placeholder - you should implement actual logic based on your image data
-    if (post.media_type === 'carousel' || post.imgUrl.includes('carousel')) {
-      // You might want to check actual dimensions here
-      return 'carousel-900x1600'; // Default carousel type
-    }
-    
-    return 'image-post';
   };
 
   if (loading) {
@@ -211,7 +200,6 @@ function CreatorProfilePage({ onNavigate }) {
         <main className={styles.postsSection}>
           <div className={styles.postsHeader}>
             <h2>Recent Posts</h2>
-            <span className={styles.postCount}>{posts.length} posts</span>
           </div>
 
           {posts.length === 0 ? (
@@ -220,87 +208,82 @@ function CreatorProfilePage({ onNavigate }) {
             </div>
           ) : (
             <div className={styles.postsGrid}>
-              {posts.map((post) => {
-                const postType = getPostType(post);
-                return (
-                  <div key={post.id} className={`${styles.postCard} ${styles[postType]}`}>
-                    <div className={styles.postHeader}>
-                      <div className={styles.postAuthorAvatar}>
-                        {creator.avatar_url ? (
-                          <img src={creator.avatar_url} alt={creator.author} />
-                        ) : (
-                          <div className={styles.avatarPlaceholder}>
-                            {creator.author.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <div className={styles.postAuthorInfo}>
-                        <div className={styles.postAuthorName}>{creator.author}</div>
-                        <div className={styles.postDate}>{formatDate(post.post_date)}</div>
-                      </div>
-                    </div>
-                    
-                    <div className={styles.postContent}>
-                      <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}>
-                        {post.post_content}
-                      </p>
-                      {post.post_content.length > 280 && (
-                        <button 
-                          className={styles.moreButton}
-                          onClick={() => togglePostExpansion(post.id)}
-                        >
-                          {expandedPosts[post.id] ? '...less' : '...more'}
-                        </button>
+              {posts.map((post) => (
+                <div key={post.id} className={styles.postCard}>
+                  <div className={styles.postHeader}>
+                    <div className={styles.postAuthorAvatar}>
+                      {creator.avatar_url ? (
+                        <img src={creator.avatar_url} alt={creator.author} />
+                      ) : (
+                        <div className={styles.avatarPlaceholder}>
+                          {creator.author.charAt(0).toUpperCase()}
+                        </div>
                       )}
                     </div>
-
-                    {post.imgUrl && (
-                      <div className={styles.postImageContainer}>
-                        <div className={styles.postImage}>
-                          <img src={post.imgUrl} alt="Post media" />
-                        </div>
-                      </div>
+                    <div className={styles.postAuthorInfo}>
+                      <div className={styles.postAuthorName}>{creator.author}</div>
+                      <div className={styles.postDate}>{formatDate(post.post_date)}</div>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.postContent}>
+                    <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}>
+                      {post.post_content}
+                    </p>
+                    {post.post_content.length > 280 && (
+                      <button 
+                        className={styles.moreButton}
+                        onClick={() => togglePostExpansion(post.id)}
+                      >
+                        {expandedPosts[post.id] ? '...less' : '...more'}
+                      </button>
                     )}
+                  </div>
 
-                    {!post.imgUrl && post.media_type === 'video' && (
-                      <div className={styles.postVideo}>
-                        <div className={styles.playButton}>
-                          <div className={styles.playIcon}></div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className={styles.socialCounts}>
-                      <div className={styles.reactions}>
-                        <div className={styles.reactionIcons}>
-                          <img className={styles.reactionIcon} 
-                               src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" 
-                               alt="like" />
-                          <img className={`${styles.reactionIcon} ${styles.stacked}`}
-                               src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds22" 
-                               alt="love" />
-                          {post.like_count > 1000 && (
-                            <img className={`${styles.reactionIcon} ${styles.stacked}`}
-                                 src="https://static.licdn.com/aero-v1/sc/h/lhxmwiwoag9qepsh4nc28zus" 
-                                 alt="insightful" />
-                          )}
-                        </div>
-                        <span className={styles.reactionCount}>
-                          {formatNumber(post.like_count)}
-                        </span>
-                      </div>
-                      
-                      <div className={styles.countItems}>
-                        <span>{formatNumber(post.comment_count)} comments</span>
-                        <span className={styles.dot}>•</span>
-                        <span>{formatNumber(post.repost_count)} reposts</span>
+                  {post.imgUrl && (
+                    <div className={styles.postImageContainer}>
+                      <div className={styles.postImage}>
+                        <img src={post.imgUrl} alt="Post media" />
                       </div>
                     </div>
+                  )}
 
-                    {/* Action buttons removed */}
+                  {!post.imgUrl && post.media_type === 'video' && (
+                    <div className={styles.postVideo}>
+                      <div className={styles.playButton}>
+                        <div className={styles.playIcon}></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={styles.socialCounts}>
+                    <div className={styles.reactions}>
+                      <div className={styles.reactionIcons}>
+                        <img className={styles.reactionIcon} 
+                             src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" 
+                             alt="like" />
+                        <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                             src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpme8epox8rdcds22" 
+                             alt="love" />
+                        <img className={`${styles.reactionIcon} ${styles.stacked}`}
+                             src="https://static.licdn.com/aero-v1/sc/h/lhxmwiwoag9qepsh4nc28zus" 
+                             alt="insightful" />
+                      </div>
+                      <span className={styles.reactionCount}>
+                        {formatNumber(post.like_count)}
+                      </span>
+                    </div>
+                    
+                    <div className={styles.countItems}>
+                      <span>{formatNumber(post.comment_count)} comments</span>
+                      <span className={styles.dot}>•</span>
+                      <span>{formatNumber(post.repost_count)} reposts</span>
+                    </div>
                   </div>
-                );
-              })}
+
+                  {/* Action buttons removed */}
+                </div>
+              ))}
             </div>
           )}
         </main>
