@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './CreatorProfilePage.module.css';
-import { Eye, Copy, Bookmark, RefreshCw } from 'lucide-react';
 
 function CreatorProfilePage({ onNavigate }) {
   const { creatorName } = useParams();
@@ -92,32 +91,6 @@ function CreatorProfilePage({ onNavigate }) {
     if (creator?.linkedin_url) {
       window.open(creator.linkedin_url, '_blank');
     }
-  };
-
-  const handleViewPost = (postUrl) => {
-    if (postUrl) {
-      window.open(postUrl, '_blank');
-    }
-  };
-
-  const handleCopyPost = async (postContent) => {
-    try {
-      await navigator.clipboard.writeText(postContent);
-      // You can add a toast notification here if you have one
-      console.log('Post copied to clipboard');
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  };
-
-  const handleSavePost = (postId) => {
-    // TODO: Implement save functionality
-    console.log('Save post:', postId);
-  };
-
-  const handleRepurposePost = (postId) => {
-    // TODO: Implement repurpose functionality
-    console.log('Repurpose post:', postId);
   };
 
   if (loading) {
