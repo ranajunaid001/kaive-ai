@@ -163,7 +163,7 @@ class OptimizedProcessor:
             
             # Handle imgUrl column
             if 'imgUrl' in row and pd.notna(row['imgUrl']):
-                post_data['imgUrl'] = clean_text(row['imgUrl'])
+                post_data['imgurl'] = clean_text(row['imgUrl'])
             
             posts_to_insert.append(post_data)
             texts_for_embedding.append(row['clean_content'])
