@@ -384,6 +384,24 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         texts_for_embedding = unique_posts['texts']
         
         logger.info(f"Found {existing_count} duplicate posts, processing {len(posts_to_insert)} new posts")
+
+        
+        # DEBUG: Check what's in the data
+        logger.info("=== DEBUG: Checking post data structure ===")
+        logger.info(f"Total posts to insert: {len(posts_to_insert)}")
+        
+        # Count posts with imgUrl
+        posts_with_img = sum(1 for post in posts_to_insert if 'imgUrl' in post)
+        logger.info(f"Posts with imgUrl field: {posts_with_img}")
+        
+        # Show first 3 posts
+        for i, post in enumerate(posts_to_insert[:3]):
+            logger.info(f"Post {i} keys: {list(post.keys())}")
+            has_img = 'imgUrl' in post
+            logger.info(f"Post {i} has imgUrl: {has_img}")
+            if has_img:
+                logger.info(f"Post {i} imgUrl value: {post.get('imgUrl', 'N/A')[:50]}...")
+
         
         # 4. Generate embeddings in parallel
         embeddings = await processor.generate_embeddings_batch(texts_for_embedding)
