@@ -161,9 +161,9 @@ class OptimizedProcessor:
             if 'postUrl' in row and pd.notna(row['postUrl']):
                 post_data['post_url'] = clean_text(row['postUrl'])
             
-            # Handle imgUrl column
-            if 'imgUrl' in row and pd.notna(row['imgUrl']):
-                post_data['imgurl'] = clean_text(row['imgUrl'])
+            # Handle imgurl column
+            if 'imgurl' in row and pd.notna(row['imgurl']):
+                post_data['imgurl'] = clean_text(row['imgurl'])
             
             posts_to_insert.append(post_data)
             texts_for_embedding.append(row['clean_content'])
@@ -365,9 +365,9 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         if not all(col in df.columns for col in required_columns):
             raise ValueError(f"Missing required columns")
         
-        # Log if imgUrl column is present
-        if 'imgUrl' in df.columns:
-            logger.info(f"Found imgUrl column in {filename}")
+        # Log if imgurl column is present
+        if 'imgurl' in df.columns:
+            logger.info(f"Found imgurl column in {filename}")
         
         logger.info(f"Processing {len(df)} rows from {filename}")
         
@@ -390,17 +390,17 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         logger.info("=== DEBUG: Checking post data structure ===")
         logger.info(f"Total posts to insert: {len(posts_to_insert)}")
         
-        # Count posts with imgUrl
-        posts_with_img = sum(1 for post in posts_to_insert if 'imgUrl' in post)
-        logger.info(f"Posts with imgUrl field: {posts_with_img}")
+        # Count posts with imgurl
+        posts_with_img = sum(1 for post in posts_to_insert if 'imgurl' in post)
+        logger.info(f"Posts with imgurl field: {posts_with_img}")
         
         # Show first 3 posts
         for i, post in enumerate(posts_to_insert[:3]):
             logger.info(f"Post {i} keys: {list(post.keys())}")
-            has_img = 'imgUrl' in post
-            logger.info(f"Post {i} has imgUrl: {has_img}")
+            has_img = 'imgurl' in post
+            logger.info(f"Post {i} has imgurl: {has_img}")
             if has_img:
-                logger.info(f"Post {i} imgUrl value: {post.get('imgUrl', 'N/A')[:50]}...")
+                logger.info(f"Post {i} imgurl value: {post.get('imgurl', 'N/A')[:50]}...")
 
         
         # 4. Generate embeddings in parallel
