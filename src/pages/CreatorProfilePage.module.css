@@ -329,7 +329,7 @@
 .postsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 16px;
   grid-auto-rows: auto;
   align-items: start;
 }
@@ -436,10 +436,9 @@
   text-decoration: underline;
 }
 
-/* Image container with padding */
+/* Image container - no extra padding */
 .postImageContainer {
   margin: 0 0 16px 0;
-  padding: 0 20px;
 }
 
 .postImage {
@@ -462,8 +461,8 @@
 }
 
 .postVideo {
-  width: calc(100% + 40px);
-  margin: 0 -20px 16px -20px;
+  width: 100%;
+  margin: 0 0 16px 0;
   height: 240px;
   background: #000;
   display: flex;
