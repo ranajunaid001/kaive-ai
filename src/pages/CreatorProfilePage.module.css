@@ -325,10 +325,13 @@
   font-size: 16px;
 }
 
-/* Posts Grid - Using Masonry Layout */
+/* Posts Grid - Using CSS Grid */
 .postsGrid {
-  column-count: 2;
-  column-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  grid-auto-rows: auto;
+  align-items: start;
 }
 
 /* Post Card - Variable height */
@@ -339,13 +342,11 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: block;
-  width: 100%;
-  margin-bottom: 16px;
-  break-inside: avoid;
-  page-break-inside: avoid;
+  position: relative;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
 
 .postCard:hover {
@@ -437,13 +438,12 @@
 
 /* Image container - no extra padding */
 .postImageContainer {
-  margin: 0 -20px 16px -20px;
-  width: calc(100% + 40px);
+  margin: 0 0 16px 0;
 }
 
 .postImage {
   width: 100%;
-  border-radius: 0;
+  border-radius: 8px;
   overflow: hidden;
   background: #f5f5f7;
 }
@@ -497,7 +497,7 @@
   margin-left: 4px;
 }
 
-/* Social Counts - At bottom of card */
+/* Social Counts - Push to bottom */
 .socialCounts {
   display: flex;
   align-items: center;
@@ -506,6 +506,7 @@
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   font-size: 12px;
   color: #6b7280;
+  margin-top: auto;
 }
 
 .reactions {
@@ -559,7 +560,7 @@
 
 @media (max-width: 968px) {
   .postsGrid {
-    column-count: 1;
+    grid-template-columns: 1fr;
   }
 }
 
