@@ -240,10 +240,10 @@ function CreatorProfilePage({ onNavigate }) {
                     )}
                   </div>
 
-                  {post.imgUrl && (
+                  {post.imgurl && (
                     <div className={styles.postImageContainer}>
                       <div className={styles.postImage}>
-                        <img src={post.imgUrl} alt="Post media" />
+                        <img src={post.imgurl} alt="Post media" />
                       </div>
                     </div>
                   )}
