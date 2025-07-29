@@ -139,13 +139,13 @@
 
 /* Main Layout */
 .mainContainer {
-  display: flex;
+  display: grid;
+  grid-template-columns: 380px 1fr;
   max-width: 1400px;
   margin: 0 auto;
   padding: 88px 40px 40px;
   gap: 32px;
-  position: relative;
-  align-items: flex-start; /* Ensure proper alignment */
+  align-items: start;
 }
 
 /* Creator Profile Card - Fixed Left */
@@ -153,10 +153,6 @@
   position: sticky;
   top: 88px;
   height: fit-content;
-  width: 380px;
-  min-width: 380px; /* Prevent shrinking */
-  max-width: 380px; /* Prevent growing */
-  flex-shrink: 0;
 }
 
 .profileCard {
@@ -305,9 +301,7 @@
 
 /* Posts Section */
 .postsSection {
-  flex: 1;
-  min-width: 0;
-  max-width: calc(100% - 412px); /* Account for profile width + gap */
+  min-width: 0; /* Prevent overflow */
 }
 
 .postsHeader {
@@ -337,7 +331,6 @@
   -webkit-column-gap: 16px;
   -moz-column-gap: 16px;
   column-gap: 16px;
-  width: 100%; /* Ensure grid takes full width of container */
 }
 
 /* Post Card - Masonry Layout */
@@ -560,14 +553,8 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .creatorProfile {
-    width: 320px;
-    min-width: 320px;
-    max-width: 320px;
-  }
-  
-  .postsSection {
-    max-width: calc(100% - 352px); /* Adjusted for smaller profile width */
+  .mainContainer {
+    grid-template-columns: 320px 1fr;
   }
   
   .profileCard {
@@ -585,21 +572,14 @@
 
 @media (max-width: 768px) {
   .mainContainer {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     padding: 80px 20px 20px;
   }
 
   .creatorProfile {
     position: relative;
     top: 0;
-    width: 100%;
-    min-width: unset;
-    max-width: unset;
     margin-bottom: 24px;
-  }
-  
-  .postsSection {
-    max-width: 100%;
   }
   
   .navContent {
