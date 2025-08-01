@@ -24,6 +24,7 @@ from functools import lru_cache
 import time
 from collections import defaultdict
 import sys
+from services.text_cleaner import clean_text
 
 # Import the fast version
 from generate_voice_profiles import generate_voice_profiles_after_clustering
@@ -57,36 +58,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
 # Cache for cleaned text
-@lru_cache(maxsize=10000)
-def clean_text_cached(text: str) -> str:
-    """Cached version of clean_text for repeated values"""
-    if not text:
-        return ""
-    
-    # Fix common encoding issues
-    replacements = {
-        'â€™': "'", 'â€"': "–", 'â€"': "—", 'â€œ': '"',
-        'â€': '"', 'â€¦': '...', 'Â': ' ', 'â': "'",
-        'ðŸ': '', 'Ã©': 'é', 'Ã¨': 'è', 'Ã ': 'à',
-        'Ã¢': 'â', 'Ã´': 'ô', 'Ã®': 'î', 'Ã§': 'ç',
-        'Ãª': 'ê', 'Ã¹': 'ù', 'Ã€': 'À', '\xa0': ' ',
-        '\u200b': ''
-    }
-    
-    for old, new in replacements.items():
-        text = text.replace(old, new)
-    
-    # Remove non-printable characters
-    text = ''.join(char for char in text if char.isprintable() or char.isspace())
-    
-    # Clean up multiple spaces
-    return ' '.join(text.split())
 
-def clean_text(text):
-    """Clean text with caching"""
-    if pd.isna(text):
-        return ""
-    return clean_text_cached(str(text))
 
 class OptimizedProcessor:
     """Optimized data processor for batch operations"""
