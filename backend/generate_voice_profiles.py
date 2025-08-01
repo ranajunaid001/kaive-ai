@@ -287,32 +287,26 @@ class FastVoiceProfileGenerator:
             return f"Content Series {cluster_id + 1}", f"A collection of posts in cluster {cluster_id}"
     
     def batch_save_profiles(self, profiles_data: List[Dict]) -> int:
-        """Save all profiles in a single batch operation"""
+        """Save all profiles using UPSERT (insert or update based on unique constraint)"""
         if not profiles_data:
             return 0
         
         success_count = 0
         
         try:
-            # Simple approach - just try to insert all
-            # If they exist, they'll fail but we'll count successes
             for profile in profiles_data:
                 try:
-                    self.supabase.table("creator_voice_profiles").insert(profile).execute()
+                    # Use upsert - this will insert if new, update if exists
+                    # The unique constraint on (creator, cluster_id) makes this work perfectly
+                    self.supabase.table("creator_voice_profiles") \
+                        .upsert(profile, on_conflict="creator,cluster_id") \
+                        .execute()
+                    
                     success_count += 1
-                    logger.info(f"Inserted profile for {profile['creator']} cluster {profile['cluster_id']}")
+                    logger.info(f"Upserted profile for {profile['creator']} cluster {profile['cluster_id']}")
+                    
                 except Exception as e:
-                    # Profile might already exist, try update
-                    try:
-                        self.supabase.table("creator_voice_profiles") \
-                            .update(profile) \
-                            .eq("creator", profile['creator']) \
-                            .eq("cluster_id", profile['cluster_id']) \
-                            .execute()
-                        success_count += 1
-                        logger.info(f"Updated profile for {profile['creator']} cluster {profile['cluster_id']}")
-                    except Exception as update_error:
-                        logger.error(f"Failed to save profile: {update_error}")
+                    logger.error(f"Failed to upsert profile for {profile['creator']} cluster {profile['cluster_id']}: {e}")
             
             return success_count
             
