@@ -17,7 +17,7 @@ import numpy as np
 import json
 import asyncio
 import concurrent.futures
-from core.config import MAX_WORKERS
+from core.config import MAX_WORKERS, BATCH_SIZE, DB_CHUNK_SIZE
 from typing import List, Dict, Tuple, Optional
 import logging
 from functools import lru_cache
@@ -93,7 +93,7 @@ class OptimizedProcessor:
     
     def __init__(self):
         self.embedding_cache = {}
-        self.batch_size = 50  # Process embeddings in batches
+        self.batch_size = BATCH_SIZE  # Process embeddings in batches
         
     async def generate_embeddings_batch(self, texts: List[str]) -> List[Optional[List[float]]]:
         """Generate embeddings in parallel batches"""
@@ -441,7 +441,7 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
         logger.info("Inserting posts to database...")
         
         # Insert in chunks to avoid timeouts
-        chunk_size = 100
+        chunk_size = DB_CHUNK_SIZE
         inserted_ids = []
         
         for i in range(0, len(posts_to_insert), chunk_size):
