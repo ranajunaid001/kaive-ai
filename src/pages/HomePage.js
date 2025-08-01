@@ -2,105 +2,16 @@ import React, { useState, useEffect } from 'react';
 import styles from './HomePage.module.css';
 
 function HomePage({ onNavigate }) {
-  const [selectedCreator, setSelectedCreator] = useState(null);
   const [userInput, setUserInput] = useState('');
-  const [showResults, setShowResults] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [wordCount, setWordCount] = useState(0);
 
-  const creators = [
-    { 
-      id: 1, 
-      initials: 'SS',
-      name: 'Simon Sinek', 
-      title: 'Leadership Expert', 
-      tone: 'Inspirational, Purpose-driven', 
-      match: 94,
-      metrics: { 
-        voice: 94,
-        authenticity: 96,
-        engagement: 92
-      }
-    },
-    { 
-      id: 2, 
-      initials: 'GV',
-      name: 'Gary Vaynerchuk', 
-      title: 'CEO & Entrepreneur', 
-      tone: 'Direct, Motivational', 
-      match: 91,
-      metrics: { 
-        voice: 91,
-        authenticity: 91,
-        engagement: 90
-      }
-    },
-    { 
-      id: 3, 
-      initials: 'JW',
-      name: 'Justin Welsh', 
-      title: 'Solopreneur', 
-      tone: 'Tactical, Growth-focused', 
-      match: 89,
-      metrics: { 
-        voice: 89,
-        authenticity: 89,
-        engagement: 88
-      }
-    },
-    { 
-      id: 4, 
-      initials: 'BM',
-      name: 'Ben Meer', 
-      title: 'Systems Thinker', 
-      tone: 'Analytical, Strategic', 
-      match: 87,
-      metrics: { 
-        voice: 87,
-        authenticity: 87,
-        engagement: 86
-      }
-    },
-    { 
-      id: 5, 
-      initials: 'SB',
-      name: 'Steve Bartlett', 
-      title: 'Podcast Host & CEO', 
-      tone: 'Vulnerable, Authentic', 
-      match: 85,
-      metrics: { 
-        voice: 85,
-        authenticity: 83,
-        engagement: 84
-      }
-    },
-    { 
-      id: 6, 
-      initials: 'JA',
-      name: 'Jasmin Alic', 
-      title: 'Brand Strategist', 
-      tone: 'Creative, Strategic', 
-      match: 83,
-      metrics: { 
-        voice: 83,
-        authenticity: 82,
-        engagement: 83
-      }
-    },
-    { 
-      id: 7, 
-      initials: 'RP',
-      name: 'Reno Perry', 
-      title: 'Content Creator', 
-      tone: 'Engaging, Conversational', 
-      match: 81,
-      metrics: { 
-        voice: 81,
-        authenticity: 80,
-        engagement: 81
-      }
-    }
-  ];
+  const suggestionPrompts = {
+    'Little Win': "Today I closed my first client after 47 cold emails. It's not a million dollar deal, but it's proof that persistence pays off.",
+    'Personal Growth': "I used to avoid difficult conversations at all costs. This week I learned that having them early saves everyone time and stress.",
+    'Failure': "My product launch flopped with zero sales on day one. Here's what I learned about market validation the hard way.",
+    'Learning': "I spent $10K on Facebook ads with terrible results. But the data taught me something valuable about my target audience.",
+    'AI Tool': "I just discovered an AI tool that saved me 10 hours this week. Here's how I'm using it to automate my content research process."
+  };
 
   const testimonials = [
     { text: "Kaive has transformed my LinkedIn game. I write 10x faster while maintaining my authentic voice. Absolutely incredible!", author: "Maria Martin", role: "@maria_martin", social: "twitter" },
@@ -113,69 +24,23 @@ function HomePage({ onNavigate }) {
     { text: "I've tried every AI writing tool out there. Kaive is the only one that truly understands LinkedIn's voice.", author: "Alex Thompson", role: "CEO & Founder", social: "twitter" }
   ];
 
-  const suggestionPrompts = {
-    'Little Win': "Today I closed my first client after 47 cold emails. It's not a million dollar deal, but it's proof that persistence pays off.",
-    'Personal Growth': "I used to avoid difficult conversations at all costs. This week I learned that having them early saves everyone time and stress.",
-    'Failure': "My product launch flopped with zero sales on day one. Here's what I learned about market validation the hard way.",
-    'Learning': "I spent $10K on Facebook ads with terrible results. But the data taught me something valuable about my target audience.",
-    'AI Tool': "I just discovered an AI tool that saved me 10 hours this week. Here's how I'm using it to automate my content research process."
-  };
-
   useEffect(() => {
     const words = userInput.trim().split(/\s+/).filter(w => w.length > 0).length;
     setWordCount(words);
   }, [userInput]);
 
-  const checkAuth = () => {
-    // Check if user is authenticated
-    const isAuthenticated = localStorage.getItem('kaive_auth_token');
-    return isAuthenticated;
-  };
-
   const fillSuggestion = (key) => {
     setUserInput(suggestionPrompts[key]);
   };
 
-  const analyzeContent = () => {
+  const handleSubmit = () => {
     if (wordCount < 20) return;
     
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setShowResults(true);
-    }, 2500);
-  };
-
-  const toggleBubble = (bubble) => {
-    if (selectedCreator?.id === bubble.id) {
-      setSelectedCreator(null);
-    } else {
-      setSelectedCreator(bubble);
-    }
-  };
-
-  const closeBubble = (event, creatorId) => {
-    event.stopPropagation();
-    if (selectedCreator?.id === creatorId) {
-      setSelectedCreator(null);
-    }
-  };
-
-  const generateContent = () => {
-    if (!selectedCreator) return;
-    
-    // Store the selected creator and user input for the app page
-    sessionStorage.setItem('selectedCreator', JSON.stringify(selectedCreator));
+    // Store the user input for later use
     sessionStorage.setItem('userInput', userInput);
     
-    // Check authentication
-    if (checkAuth()) {
-      // User is logged in, go to app page
-      window.location.href = 'https://app.kaive.xyz';
-    } else {
-      // User is not logged in, go to login page
-      window.location.href = '/login';
-    }
+    // Redirect directly to login page
+    window.location.href = '/login';
   };
 
   const socialIcons = {
@@ -222,125 +87,51 @@ function HomePage({ onNavigate }) {
       </section>
       
       {/* Input Card */}
-      {!showResults && !isAnalyzing && (
-        <>
-          <div className={styles.inputCard}>
-            <textarea 
-              className={styles.inputArea}
-              placeholder="What do you want to write about?"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              autoFocus
-            />
-            <button 
-              className={`${styles.sendBtn} ${wordCount >= 20 ? styles.active : ''}`}
-              onClick={analyzeContent}
-              disabled={wordCount < 20}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M7 11L12 6L17 11M12 6V18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-            
-            <div className={styles.suggestions}>
-              <div className={styles.suggestionsLabel}>Not sure where to start? Try one of these:</div>
-              <div className={styles.suggestionPills}>
-                <div className={styles.pill} onClick={() => fillSuggestion('Little Win')}>Little Win</div>
-                <div className={styles.pill} onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
-                <div className={styles.pill} onClick={() => fillSuggestion('Failure')}>Failure</div>
-                <div className={styles.pill} onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
-                <div className={styles.pill} onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Trust Section */}
-          <div className={styles.trustSection}>
-            <div className={styles.trustAvatars}>
-              <div className={styles.avatar} style={{ background: '#2196F3' }}>JW</div>
-              <div className={styles.avatar} style={{ background: '#FF6B35' }}>SB</div>
-              <div className={styles.avatar} style={{ background: '#2196F3' }}>DB</div>
-            </div>
-            <span style={{ fontSize: '14px', color: '#1a1a1a', opacity: 0.7 }}>Trusted by 50K+ writers</span>
-          </div>
-        </>
-      )}
-      
-      {/* Loading State */}
-      {isAnalyzing && (
-        <div className={`${styles.loading} ${styles.show}`}>
-          <div className={styles.spinner}></div>
-          <h3 style={{ fontSize: '24px', color: '#1a1a1a', marginBottom: '8px' }}>Analyzing your writing style</h3>
-          <p style={{ color: '#666' }}>Finding the perfect creator match...</p>
-        </div>
-      )}
-      
-      {/* Results Section */}
-      {showResults && (
-        <div className={`${styles.resultsSection} ${styles.show}`}>
-          <div className={styles.resultsHeader}>
-            <h2>Select your voice</h2>
-            <p>Choose a creator whose style resonates with your content</p>
-          </div>
-          
-          <div className={styles.container}>
-            {creators.map((creator, index) => (
-              <div 
-                key={creator.id}
-                className={`${styles.bubble} ${selectedCreator?.id === creator.id ? styles.expanded : styles.circle} ${selectedCreator && selectedCreator.id !== creator.id ? styles.pushedBack : ''}`}
-                data-match={creator.match}
-                onClick={() => toggleBubble(creator)}
-                style={{
-                  animationDelay: `${index * 0.3}s`,
-                  // Adjusted positions to fit within 500px height
-                  left: `${[25, 70, 10, 50, 85, 35, 65][index]}%`,
-                  top: `${[15, 10, 35, 30, 40, 55, 60][index]}%`
-                }}
-              >
-                <button 
-                  className={styles.closeBtn} 
-                  onClick={(e) => closeBubble(e, creator.id)}
-                >
-                  ×
-                </button>
-                <div className={styles.initials}>{creator.initials}</div>
-                <div className={styles.name}>{creator.name}</div>
-                <div className={styles.title}>{creator.title}</div>
-                <div className={styles.match}>{creator.match}% match</div>
-                
-                <div className={styles.expandedContent}>
-                  <div className={styles.divider}></div>
-                  <div className={styles.metric}>
-                    <div className={styles.metricLabel}>Voice Match</div>
-                    <div className={styles.metricBar}>
-                      <div className={styles.metricFill} style={{ width: `${creator.metrics.voice}%` }}></div>
-                    </div>
-                  </div>
-                  <div className={styles.metric}>
-                    <div className={styles.metricLabel}>Authenticity</div>
-                    <div className={styles.metricBar}>
-                      <div className={styles.metricFill} style={{ width: `${creator.metrics.authenticity}%` }}></div>
-                    </div>
-                  </div>
-                  <div className={styles.metric}>
-                    <div className={styles.metricLabel}>Engagement</div>
-                    <div className={styles.metricBar}>
-                      <div className={styles.metricFill} style={{ width: `${creator.metrics.engagement}%` }}></div>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    className={styles.generateBtn}
-                    onClick={generateContent}
-                  >
-                    Generate Post
-                  </button>
-                </div>
-              </div>
-            ))}
+      <div className={styles.inputCard}>
+        <textarea 
+          className={styles.inputArea}
+          placeholder="What do you want to write about?"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey && wordCount >= 20) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          autoFocus
+        />
+        <button 
+          className={`${styles.sendBtn} ${wordCount >= 20 ? styles.active : ''}`}
+          onClick={handleSubmit}
+          disabled={wordCount < 20}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 11L12 6L17 11M12 6V18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+        
+        <div className={styles.suggestions}>
+          <div className={styles.suggestionsLabel}>Not sure where to start? Try one of these:</div>
+          <div className={styles.suggestionPills}>
+            <div className={styles.pill} onClick={() => fillSuggestion('Little Win')}>Little Win</div>
+            <div className={styles.pill} onClick={() => fillSuggestion('Personal Growth')}>Personal Growth</div>
+            <div className={styles.pill} onClick={() => fillSuggestion('Failure')}>Failure</div>
+            <div className={styles.pill} onClick={() => fillSuggestion('Learning')}>Learning Experience</div>
+            <div className={styles.pill} onClick={() => fillSuggestion('AI Tool')}>AI Tool</div>
           </div>
         </div>
-      )}
+      </div>
+      
+      {/* Trust Section */}
+      <div className={styles.trustSection}>
+        <div className={styles.trustAvatars}>
+          <div className={styles.avatar} style={{ background: '#2196F3' }}>JW</div>
+          <div className={styles.avatar} style={{ background: '#FF6B35' }}>SB</div>
+          <div className={styles.avatar} style={{ background: '#2196F3' }}>DB</div>
+        </div>
+        <span style={{ fontSize: '14px', color: '#1a1a1a', opacity: 0.7 }}>Trusted by 50K+ writers</span>
+      </div>
       
       {/* Testimonials Section */}
       <section className={styles.testimonialsSection}>
