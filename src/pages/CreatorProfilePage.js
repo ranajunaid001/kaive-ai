@@ -227,9 +227,9 @@ function CreatorProfilePage({ onNavigate }) {
                   </div>
                   
                   <div className={styles.postContent}>
-                    <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}>
-                      style={{ whiteSpace: 'pre-wrap' }}>
-                      {post.post_content}
+                     <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}
+                         style={{ whiteSpace: 'pre-wrap' }}>
+                        {post.post_content}
                     </p>
                     {post.post_content.length > 280 && (
                       <button 
