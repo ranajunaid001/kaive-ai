@@ -348,6 +348,25 @@ class FastVoiceProfileGenerator:
             # 4. CALCULATE ALL METRICS - Vectorized
             all_metrics = self.calculate_all_metrics_vectorized(posts_by_cluster)
             
+            # 4.5 CALCULATE CLUSTER CENTROIDS - NEW
+            cluster_centroids = {}
+            for cluster_id, posts in posts_by_cluster.items():
+                # Get all valid embeddings for this cluster
+                embeddings = []
+                for post in posts:
+                    if post.get('embedding') and isinstance(post['embedding'], list):
+                        embeddings.append(post['embedding'])
+                
+                # Calculate centroid if we have embeddings
+                if embeddings:
+                    embeddings_array = np.array(embeddings)
+                    centroid = embeddings_array.mean(axis=0).tolist()  # Convert to list for JSON storage
+                    cluster_centroids[cluster_id] = centroid
+                    logger.info(f"Calculated centroid for cluster {cluster_id} with {len(embeddings)} posts")
+                else:
+                    cluster_centroids[cluster_id] = None
+                    logger.warning(f"No valid embeddings for cluster {cluster_id}")
+            
             # 5. PREPARE AI DESCRIPTIONS - Get representative posts
             ai_tasks = {}
             for cluster_id, posts in posts_by_cluster.items():
@@ -405,7 +424,8 @@ class FastVoiceProfileGenerator:
                     "top_post_ids": metrics.top_post_ids,
                     "performance_rank": 0,
                     "created_at": datetime.now().isoformat(),
-                    "updated_at": datetime.now().isoformat()
+                    "updated_at": datetime.now().isoformat(),
+                    "centroid_embedding": cluster_centroids.get(cluster_id)  # ADD CENTROID HERE
                 }
                 
                 profiles_data.append(profile)
