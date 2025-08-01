@@ -54,7 +54,7 @@ supabase: Client = create_client(
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Thread pool for parallel processing
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS))
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
 # Cache for cleaned text
 @lru_cache(maxsize=10000)
