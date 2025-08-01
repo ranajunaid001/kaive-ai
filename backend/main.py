@@ -17,6 +17,7 @@ import numpy as np
 import json
 import asyncio
 import concurrent.futures
+from core.config import MAX_WORKERS
 from typing import List, Dict, Tuple, Optional
 import logging
 from functools import lru_cache
@@ -53,7 +54,7 @@ supabase: Client = create_client(
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Thread pool for parallel processing
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS))
 
 # Cache for cleaned text
 @lru_cache(maxsize=10000)
