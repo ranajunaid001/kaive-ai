@@ -25,6 +25,7 @@ import time
 from collections import defaultdict
 import sys
 from services.text_cleaner import clean_text
+from services.file_processor import FileProcessor
 
 # Import the fast version
 from generate_voice_profiles import generate_voice_profiles_after_clustering
@@ -95,59 +96,6 @@ class OptimizedProcessor:
                 # Continue with other batches
                 
         return embeddings
-    
-    def prepare_post_data_batch(self, df: pd.DataFrame) -> Tuple[List[Dict], List[str]]:
-        """Prepare all post data efficiently"""
-        posts_to_insert = []
-        texts_for_embedding = []
-        
-        # Vectorized operations on DataFrame
-        df['clean_content'] = df['postContent'].apply(clean_text)
-        df['clean_author'] = df['author'].apply(clean_text)
-        
-        # Filter valid posts
-        valid_mask = (df['clean_content'].str.len() > 0) & (df['clean_author'].str.len() > 0)
-        valid_df = df[valid_mask].copy()
-        
-        # Parse dates efficiently
-        valid_df['post_date'] = pd.to_datetime(valid_df['postDate'], errors='coerce').fillna(datetime.now()).dt.strftime('%Y-%m-%d')
-        
-        # Fix for timestamp - apply isoformat to each value, not to the series
-        valid_df['post_timestamp'] = pd.to_datetime(valid_df['postTimestamp'], errors='coerce').fillna(datetime.now()).apply(lambda x: x.isoformat())
-        
-        # Parse numeric fields
-        for col, new_col in [('likeCount', 'like_count'), ('commentCount', 'comment_count'), ('repostCount', 'repost_count')]:
-            valid_df[new_col] = pd.to_numeric(valid_df[col].astype(str).str.replace(',', ''), errors='coerce').fillna(0).astype(int)
-        
-        # Build post data
-        for _, row in valid_df.iterrows():
-            post_data = {
-                'author': row['clean_author'],
-                'post_content': row['clean_content'],
-                'post_date': row['post_date'],
-                'like_count': row['like_count'],
-                'comment_count': row['comment_count'],
-                'repost_count': row['repost_count'],
-                'post_timestamp': row['post_timestamp']
-            }
-            
-            if 'postUrl' in row and pd.notna(row['postUrl']):
-                post_data['post_url'] = clean_text(row['postUrl'])
-            
-            # Handle imgUrl column - check both imgUrl and imgurl
-            img_col = None
-            if 'imgUrl' in row:
-                img_col = 'imgUrl'
-            elif 'imgurl' in row:
-                img_col = 'imgurl'
-                
-            if img_col and pd.notna(row[img_col]) and str(row[img_col]).strip():
-                post_data['imgurl'] = clean_text(str(row[img_col]))
-            
-            posts_to_insert.append(post_data)
-            texts_for_embedding.append(row['clean_content'])
-        
-        return posts_to_insert, texts_for_embedding
     
     def cluster_posts_batch(self, embeddings: np.ndarray, n_clusters: int = 4) -> np.ndarray:
         """Optimized clustering"""
@@ -331,29 +279,19 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
     """Optimized file processing pipeline with deduplication"""
     start_time = time.time()
     processor = OptimizedProcessor()
+    file_processor = FileProcessor()  # NEW: Create FileProcessor instance
     
     try:
-        # 1. Read file
-        if filename.endswith('.csv'):
-            df = pd.read_csv(io.BytesIO(contents), encoding='utf-8')
-        else:
-            df = pd.read_excel(io.BytesIO(contents))
+        # 1. Read file - UPDATED to use FileProcessor
+        df = file_processor.read_file(contents, filename)
         
-        # 2. Validate columns
-        required_columns = ['postContent', 'author', 'likeCount', 'commentCount', 'repostCount', 'postDate', 'postTimestamp']
-        if not all(col in df.columns for col in required_columns):
-            raise ValueError(f"Missing required columns")
-        
-        # Log if imgUrl/imgurl column is present
-        if 'imgUrl' in df.columns:
-            logger.info(f"Found imgUrl column in {filename}")
-        elif 'imgurl' in df.columns:
-            logger.info(f"Found imgurl column in {filename}")
+        # 2. Validate columns - UPDATED to use FileProcessor
+        file_processor.validate_columns(df)
         
         logger.info(f"Processing {len(df)} rows from {filename}")
         
-        # 3. Prepare all data at once
-        posts_to_insert, texts_for_embedding = processor.prepare_post_data_batch(df)
+        # 3. Prepare all data at once - UPDATED to use FileProcessor
+        posts_to_insert, texts_for_embedding = file_processor.prepare_post_data_batch(df)
         
         if not posts_to_insert:
             logger.warning("No valid posts to process")
@@ -393,21 +331,8 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                 post['embedding'] = embedding
         
         # 5. CRITICAL FIX: Ensure all posts have the same structure before insert
-        if posts_to_insert:
-            # Get all possible keys from all posts
-            all_keys = set()
-            for post in posts_to_insert:
-                all_keys.update(post.keys())
-            
-            logger.info(f"All unique keys found: {all_keys}")
-            
-            # Make sure every post has every key (use None for missing)
-            for post in posts_to_insert:
-                for key in all_keys:
-                    if key not in post:
-                        post[key] = None
-            
-            logger.info(f"Standardized all posts to have {len(all_keys)} keys")
+        # UPDATED to use FileProcessor
+        posts_to_insert = file_processor.standardize_post_keys(posts_to_insert)
         
         # 5. Batch insert all posts
         logger.info("Inserting posts to database...")
@@ -439,12 +364,8 @@ async def process_file_optimized(contents: bytes, filename: str, file_record_id:
                 creators_data[post['author']]['ids'].append(post_id)
                 creators_data[post['author']]['embeddings'].append(embedding)
         
-        # 7. Get ALL creators from the file for processing
-        all_creators_in_file = set()
-        for _, row in df.iterrows():
-            author = clean_text(row.get('author', ''))
-            if author:
-                all_creators_in_file.add(author)
+        # 7. Get ALL creators from the file for processing - UPDATED to use FileProcessor
+        all_creators_in_file = file_processor.get_all_creators_from_df(df)
         
         logger.info(f"Found {len(all_creators_in_file)} unique creators in file")
         
