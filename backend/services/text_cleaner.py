@@ -29,7 +29,7 @@ def clean_text_cached(text: str) -> str:
     text = ''.join(char for char in text if char.isprintable() or char.isspace())
     
     # Clean up multiple spaces
-    return ' '.join(text.split())
+    return text
 
 def clean_text(text):
     """Clean text with caching"""
