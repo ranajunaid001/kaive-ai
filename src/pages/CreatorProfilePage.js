@@ -228,6 +228,7 @@ function CreatorProfilePage({ onNavigate }) {
                   
                   <div className={styles.postContent}>
                     <p className={expandedPosts[post.id] ? styles.expanded : styles.collapsed}>
+                      style={{ whiteSpace: 'pre-wrap' }}>
                       {post.post_content}
                     </p>
                     {post.post_content.length > 280 && (
